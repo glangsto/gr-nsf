@@ -22,7 +22,7 @@ The Watch.conf is a configuration file for the Nsf*.grc blocks
 The Watch.not is a *Note File* describing the astronomical setup.  This file also contains a spectrum observation,
 as the goal of the data header is to allow a complete re-observation, based on the previous header values.
 
-### To use these blocks, without installing into the standard GRC path, use these commands:
+### To test these blocks, without installing into the standard GRC path, use these commands:
 
 `cd examples`
 
@@ -32,3 +32,8 @@ and update your ~/.gnuradio/config.conf file with this path:
 
 `local_blocks_path = ./:../grc:/usr/local/share/gnuradio/grc/blocks/`
 
+Glen Langston -- glen.i.langston@gmail.com
+
+### Documentation
+
+http://www.opensourceradiotelescopes.org/wiki
