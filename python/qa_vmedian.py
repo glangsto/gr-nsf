@@ -22,7 +22,7 @@
 import numpy
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-from ra_vave import vmedian
+from ra_vmedian import ra_vmedian
 
 class qa_vmedian (gr_unittest.TestCase):
     """
@@ -49,7 +49,7 @@ class qa_vmedian (gr_unittest.TestCase):
         src = blocks.vector_source_f( vin.tolist())
         s2v = blocks.stream_to_vector(gr.sizeof_float, vsize)
         # block we're testing
-        vblock = vmedian( vsize, vdecimate)
+        vblock = ra_vmedian( vsize, vdecimate)
 
         v2s = blocks.vector_to_stream( gr.sizeof_float, vsize)
         snk = blocks.vector_sink_f(vsize)

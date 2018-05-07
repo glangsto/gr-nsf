@@ -23,22 +23,28 @@ import numpy
 import copy
 from gnuradio import gr
 
-class ra_vave(gr.decim_block):
+class ra_vmedian(gr.decim_block):
     """
-    Vector Average with Decimation.   Only one vector is returned for N input.
+    Vector Median with Decimation.   Only one vector is returned for N input.
+    The highest and lowest values in each channel are discard and the remainder averaged.
     This block is intended to reduce the downstream CPU load.
     """
     def __init__(self, vlen, vdecimate):
         gr.decim_block.__init__(self,
-            name="ra_vave",
+            name="ra_vmedian",
             in_sig=[(numpy.float32, int(vlen))],
             out_sig=[(numpy.float32, int(vlen))], 
             decim=int(vdecimate))
         self.vlen = int(vlen)
-        self.vdecimate = int( vdecimate)
-        self.set_decimate( vdecimate)
-        self.sum = numpy.zeros(self.vlen)
+        self.vdecimate = int(vdecimate)
+        self.vsum = numpy.zeros(self.vlen)
+        self.vmin = numpy.zeros(self.vlen)
+        self.vmax = numpy.zeros(self.vlen)
         self.count = 0
+        if self.vdecimate < 3:
+            print 'Vector Median, not enough inputs: ',self.vdecimate, ' Using 3'
+            self.vdecimate = 3
+        self.set_decimate( self.vdecimate)
 
     def forecast( self, noutput_items, ninput_items):
         if noutput_items == None:
@@ -58,7 +64,7 @@ class ra_vave(gr.decim_block):
         nv = len(inn)          # number of vectors in this port
         ini = inn[0]           # first input vector
         li = len(ini)          # length of first input vector
-        ncp = min( li, self.vlen)  # don't copy more required (not used)
+        ncp = min( li, self.vlen) # get length to copy
 
         noutports = len( output_items)
         if noutports != 1:
@@ -67,6 +73,7 @@ class ra_vave(gr.decim_block):
         nout = len(out)        # number of output vectors
         out0 = out[0]          # get the first output vector
         lo = len(out0)         # length of 1st output vector
+#        print 'Number work outputs: ', nout,' Length: ',lo
 
         iout = 0 # count the number of output vectors
         for i in range(nv):
@@ -75,36 +82,38 @@ class ra_vave(gr.decim_block):
 
             # now save this vector until all are received
             if self.count == 0:
-                self.sum[0:ncp] = ini[0:ncp]
+                # if first vector, averge, min and max are all the same.
+                self.vsum[0:ncp] = ini[0:ncp]
+                self.vmin[0:ncp] = ini[0:ncp]
+                self.vmax[0:ncp] = ini[0:ncp]
             else:
-                self.sum[0:ncp] = self.sum[0:ncp] + ini[0:ncp]
+                self.vsum[0:ncp] = self.vsum[0:ncp] + ini[0:ncp]
+                self.vmin = numpy.minimum( self.vmin, ini)
+                self.vmax = numpy.maximum( self.vmax, ini)
             self.count = self.count + 1
 
-            # indicate consumption of a vector from input
-
+            # if time to mornalize sum and output
             if self.count >= self.vdecimate:
-                # normalize output average
-                self.sum = self.oneovern * self.sum
+                # normalize output average removing min and max
+                self.vsum = self.vsum - (self.vmin + self.vmax)
+                self.vsum = self.oneovern * self.vsum
                 outi = out[iout]  # get pointer to ith output
-                outi = self.sum   # copy vector to output
+                outi = self.vsum  # copy vector to output
                 out[iout] = outi  # put a vector in list
                 iout = iout+1     # move to next item in list
                 # now reset the count and restart the sum
                 self.count = 0
         # end for all input vectors
         output_items[0] = out  # put all vectors in output port 0
-#        print 'N outputs: ', len(output_items[0]), iout
         return len(output_items[0])
-    # end vave()
+    # end vmedian()
 
-#   callback function for grc, to update the decimate 
     def set_decimate( self, decimate):
         """
         set_decimate updates the average and decimate count
         This should update the time the block takes to complete and
         the Signal to Noise ratio of the sum.
         """
-        self.vdecimate = max( 1, int( decimate))
-        self.oneovern = 1./float( self.vdecimate)
-        print "V_ave decimate   : %d" % (self.vdecimate)
-        
+        self.vdecimate = max( 3, int( decimate))
+        self.oneovern = 1./(float(self.vdecimate)-2.)
+        print "V_median decimate: %d" % (self.vdecimate)

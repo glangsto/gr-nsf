@@ -22,7 +22,7 @@
 import numpy
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
-from ra_vave import vave
+from ra_vave import ra_vave
 
 class qa_vave (gr_unittest.TestCase):
     """
@@ -47,7 +47,7 @@ class qa_vave (gr_unittest.TestCase):
         src = blocks.vector_source_f( vin.tolist())
         s2v = blocks.stream_to_vector(gr.sizeof_float, vsize)
         # block we're testing
-        vblock = vave( vsize, vdecimate)
+        vblock = ra_vave( vsize, vdecimate)
 
 #        print 'Vblock: ',dir(vblock)
         vblock.set_decimate( vdecimate)
