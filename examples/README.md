@@ -32,8 +32,9 @@ and update your ~/.gnuradio/config.conf file with this path:
 
 `local_blocks_path = ./:../grc:/usr/local/share/gnuradio/grc/blocks/`
 
-Glen Langston -- glen.i.langston@gmail.com
-
 ### Documentation
 
-http://www.opensourceradiotelescopes.org/wiki
+http://www.opensourceradiotelescopes.org/wk
+
+Glen Langston -- glen.i.langston@gmail.com
+
