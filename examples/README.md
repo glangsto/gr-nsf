@@ -1,11 +1,10 @@
 ## Example Radio Astronomy Integrate Spectra tools built with Gnuradio Companion (GRC)
 
-### These blocks are useful for Radio Astronomy Spectral Line Observations,
-particularly observations of our Milky Way Galaxy.
+### These blocks are useful for Radio Astronomy Spectral Line Observations, particularly observations of our Milky Way Galaxy.
 
 The GRC files are:
 
-1. vectordemo.grc - Simple test block comparing the simulated data before and after averaging.
+1. vectordemo.grc - Simple test block comparing the simulated data before and after averaging and medianing.
 
 1. Integrate_test.grc - More complicated test function using all blocks in the NsfIntegrate Designs except
 the osmosdr block.
@@ -14,16 +13,16 @@ the osmosdr block.
 
 1. NsfIntegrate20.grc - Block configured to use an RTL SDR dongle with 2.0 MHz bandwidth for Radio Astronomy Observations
 
-The '*.ast' files contain example spectra. 
+The '*.ast' files contain example spectral line observations. 
 
-The '*.hot' files contains a hot-load calibration observation.  The NsfIntegrate blocks can overwrite these files.
+The '*.hot' files contains hot-load calibration observations.  The NsfIntegrate blocks can overwrite these files.
 
 The Watch.conf is a configuration file for the Nsf*.grc blocks
 
-The Watch.not is a Note file describing the astronomical setup.  This is also a spectrum observation,
-as the goal of the data header was to allow a complete re-observtion based on the header values.
+The Watch.not is a *Note File* describing the astronomical setup.  This file also contains a spectrum observation,
+as the goal of the data header is to allow a complete re-observtion, based on the previous header values.
 
-To use these blocks, without installing into the standard GRC path, use these commands:
+### To use these blocks, without installing into the standard GRC path, use these commands:
 
 `cd examples`
 
