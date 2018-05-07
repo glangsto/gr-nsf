@@ -4,10 +4,10 @@
 
 The GRC files are:
 
-1. vectordemo.grc - Simple test block comparing the simulated data before and after averaging and medianing.
+1. vectordemo.grc - Simple test block comparing the simulated data after averaging and medianing.
 
 1. Integrate_test.grc - More complicated test function using all blocks in the NsfIntegrate Designs except
-the osmosdr block.
+the *Osmosdr* block.
 
 1. NsfIntegrate60.grc - Block configured to use an AIRSPY mini with 6.0 MHz bandwidth for Radio Astronomy Observations
 
