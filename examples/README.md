@@ -20,7 +20,7 @@ The '*.hot' files contains hot-load calibration observations.  The NsfIntegrate 
 The Watch.conf is a configuration file for the Nsf*.grc blocks
 
 The Watch.not is a *Note File* describing the astronomical setup.  This file also contains a spectrum observation,
-as the goal of the data header is to allow a complete re-observtion, based on the previous header values.
+as the goal of the data header is to allow a complete re-observation, based on the previous header values.
 
 ### To use these blocks, without installing into the standard GRC path, use these commands:
 
