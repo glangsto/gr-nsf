@@ -47,7 +47,7 @@ class ra_ascii_sink(gr.sync_block):
     def __init__(self, noteName, observers, vlen, frequency, bandwidth, azimuth, elevation, record, obstype, 
                  nmedian, nave, site, device, gain1, gain2, gain3):
         gr.sync_block.__init__(self,
-            name="ascii_sink",
+            name="ra_ascii_sink",
                      # spectrum
             in_sig=[(np.float32, int(vlen))],
             out_sig=None)

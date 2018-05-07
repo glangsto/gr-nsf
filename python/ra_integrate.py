@@ -306,6 +306,48 @@ class ra_integrate(gr.sync_block):
         self.obs.writecount = self.obs.writecount + 1
         self.obs.write_ascii_file( self.obs.datadir, outname)
 
+    def compute_thotcold( self, yv, hv, cv, thot, tcold):
+        """ 
+        compute_tsky() compute an array of calibrated spectra assuming hot, cold obs.
+        The inputs are:
+        yv      spectrum to calibrate (raw counts).  This is also the cold lod spectrum
+        hv      spectrum of hot load (raw counts).
+        cv      cold sky spectrum (raw counts).
+        thot    Hot load temperature in Kelvins (usually between 275. an 300 K
+        tcold   Cold load temperature in Kelvins (usually between 10 and 100 K
+        """
+        nData = self.vlen
+
+        tsys = np.zeros(nData)      # initialize arrays with zeros
+        Y = np.zeros(nData)        
+        # For full Temp calibration, a spectrum taken at high elevation away from 
+        # The galactic plan is used.   For this program the cold spectrum must be
+        # the spectrum being calibrated.   See the M command for comparision
+        # comput the cold/hot ratio
+        Y = hv/cv                       # Y is ratio of hot data to cold data
+        YM1 = Y - 1.                    # Y minus 1
+        YM1 = np.maximum( YM1, epsilons)  # avoid divide by zero
+
+        # the cold, receiver, temperature is this function
+        tsys = (thot - (Y * tcold))/YM1
+    
+        n6 = int(nData/6)
+        n56 = 5*n6
+
+        tsysmedian = statistics.median( tsys[n6:n56])
+        chot = statistics.median( hv[n6:n56])
+        ccold = statistics.median( yv[n6:n56])
+        if verbose:
+            print 'Medians of input raw spectra: C hot = %5.2f; C cold = %5.2f Counts ' % (chot, ccold)
+
+        tsky  = np.zeros(nData)    # initialize arrays
+
+        # The system gain Sgain is computed assuming a tsys is the cold load
+        Sgain = np.full( nData, (tsysmedian+thot))/hv
+        # scale the observed instensity in counts to Kelvins.
+        tsky = Sgain * yv
+
+        return tsky, tsysmedian
 
     def work(self, input_items, output_items):
         """
@@ -438,19 +480,20 @@ class ra_integrate(gr.sync_block):
                 cold[nout] = 10. * np.log10( self.cold.ydataA)
                 ref[nout] = 10. * np.log10( self.ref.ydataA)
             elif self.units == radioastronomy.UNITKELVIN:
-                dc = self.hot.ydataA - self.cold.ydataA
-                dc = np.maximum( dc, self.epsilons)
-                self.hot.ydataA = np.maximum( self.hot.ydataA[0:self.vlen], self.epsilons[0:self.vlen])
-                Z = self.cold.ydataA[0:self.vlen]/self.hot.ydataA[0:self.vlen]
-                oneMZ = np.full( self.vlen, 1.) - Z
-                oneMZ = np.maximum( oneMZ, self.epsilons)
-                tsys =  ((Z*self.thot) - self.tcold)/oneMZ
+                hv = self.hot.ydataA[0:self.vlen] 
+                hv = numpy.maximum( hv, self.epsilons[0:self.vlen])
+                cv = self.cold.ydataA[0:self.vlen]
+                cv = numpy.maximum( cv, self.epsilons[0:self.vlen])
+                yv = self.ave.ydataA[0:self.vlen]
+                yv = numpy.maximum( yv, self.epsilons[0:self.vlen])
+                tsys, TRX = self.compute_thotcold( yv, hv, cv, self.thot, self.tcold)
+                TSYS = TRX + self.thot
                 # now compute center scalar value
-                TSYS = statistics.median(tsys[n6:n56])
-                oneoverhot = np.full(self.vlen, 1.) / self.hot.ydataA
+                oneoverhot = np.full( self.vlen, 1.)
+                oneoverhot = oneoverhot / hv
                 out[nout] = TSYS * spec * oneoverhot
-                ave[nout] = TSYS * self.ave.ydataA * oneoverhot
-                hot[nout] = np.full( self.vlen, TSYS)
+                ave[nout] = tsys
+                hot[nout] = np.full( self.vlen, TSYS+self.thot)
                 cold[nout] = TSYS * self.cold.ydataA * oneoverhot
                 ref[nout] = TSYS * self.ref.ydataA * oneoverhot
 
