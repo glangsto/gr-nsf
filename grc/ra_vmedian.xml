@@ -3,8 +3,8 @@
   <name>Vmedian</name>
   <key>ra_vmedian</key>
   <category>[ra]</category>
-  <import>import ra_vave</import>
-  <make>ra_vave.vmedian($vlen, $vdecimate)</make>
+  <import>import ra_vmedian</import>
+  <make>ra_vmedian.ra_vmedian($vlen, $vdecimate)</make>
   <callback>set_decimate( $vdecimate)</callback>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:

@@ -4,7 +4,7 @@
   <key>ra_vave</key>
   <category>[ra]</category>
   <import>import ra_vave</import>
-  <make>ra_vave.vave($vlen, $vdecimate)</make>
+  <make>ra_vave.ra_vave($vlen, $vdecimate)</make>
   <callback>set_decimate( $vdecimate)</callback>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
