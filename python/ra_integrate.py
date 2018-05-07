@@ -326,7 +326,7 @@ class ra_integrate(gr.sync_block):
         # comput the cold/hot ratio
         Y = hv/cv                       # Y is ratio of hot data to cold data
         YM1 = Y - 1.                    # Y minus 1
-        YM1 = np.maximum( YM1, epsilons)  # avoid divide by zero
+        YM1 = np.maximum( YM1, self.epsilons)  # avoid divide by zero
 
         # the cold, receiver, temperature is this function
         tsys = (thot - (Y * tcold))/YM1
@@ -337,8 +337,6 @@ class ra_integrate(gr.sync_block):
         tsysmedian = statistics.median( tsys[n6:n56])
         chot = statistics.median( hv[n6:n56])
         ccold = statistics.median( yv[n6:n56])
-        if verbose:
-            print 'Medians of input raw spectra: C hot = %5.2f; C cold = %5.2f Counts ' % (chot, ccold)
 
         tsky  = np.zeros(nData)    # initialize arrays
 
@@ -481,11 +479,11 @@ class ra_integrate(gr.sync_block):
                 ref[nout] = 10. * np.log10( self.ref.ydataA)
             elif self.units == radioastronomy.UNITKELVIN:
                 hv = self.hot.ydataA[0:self.vlen] 
-                hv = numpy.maximum( hv, self.epsilons[0:self.vlen])
+                hv = np.maximum( hv, self.epsilons[0:self.vlen])
                 cv = self.cold.ydataA[0:self.vlen]
-                cv = numpy.maximum( cv, self.epsilons[0:self.vlen])
+                cv = np.maximum( cv, self.epsilons[0:self.vlen])
                 yv = self.ave.ydataA[0:self.vlen]
-                yv = numpy.maximum( yv, self.epsilons[0:self.vlen])
+                yv = np.maximum( yv, self.epsilons[0:self.vlen])
                 tsys, TRX = self.compute_thotcold( yv, hv, cv, self.thot, self.tcold)
                 TSYS = TRX + self.thot
                 # now compute center scalar value
