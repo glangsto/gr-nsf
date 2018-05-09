@@ -8,7 +8,7 @@ noisy radio astronomy spectra, in a manner resistant to short term interference.
 
 1. python - directory of python functions implimenting median filtering (with decimation) of spectra and observing interfaces.
 
-1. examples - directoy of test GRC programs and the observing interface.
+1. examples - directory of test GRC programs and the observing interface.
 
 1. images - directory of images for documenting the code
 
