@@ -1,8 +1,8 @@
 ## gr-nsf
-### Nsf-Integrate: library of Gnuradio Companion (GRC) blocks and Python code for Radio Astronomy
+### Nsf-Integrate: Library of Gnuradio Companion (GRC) blocks and Python code for Radio Astronomy
 
-This repository contains relatively simple GRC blocks to improving averaging of
-noisy radio astronomy spectra in a manner resistant to short term interference.
+This repository contains relatively simple GRC blocks to improve averaging of
+noisy radio astronomy spectra, in a manner resistant to short term interference.
 
 1. grc - directory of GRC xml files, which provide an iterface between GRC and the new python code
 
@@ -22,6 +22,5 @@ Note that a data directory will be created when recording data.
 
 http://www.opensourceradiotelescopes.org/wk
 
-Glen Langston -- glen.i.langston@gmail.com
-
+Glen Langston -- glen.i.langston@gmail.com -- 2018 May 9
 
