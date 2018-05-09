@@ -25,6 +25,7 @@ as the goal of the data header is to allow a complete re-observation, based on t
 ### To test these blocks, without installing into the standard GRC path, use these commands:
 
 `cd examples`
+
 `export PYTHONPATH=../python:$PYTHONPATH`
 
 and update your ~/.gnuradio/config.conf file with this path:
