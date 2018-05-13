@@ -128,7 +128,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -214,11 +214,11 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
-      <value>6.E6</value>
+      <value>6.e6</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -251,6 +251,33 @@
     <param>
       <key>writeback</key>
       <value>Bandwidth</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1080, 29)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ConfigFile</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"Watch60.conf"</value>
     </param>
   </block>
   <block>
@@ -339,7 +366,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -425,7 +452,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -480,7 +507,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(848, 312)</value>
+      <value>(960, 318)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -511,7 +538,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -523,7 +550,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(840, 188)</value>
+      <value>(952, 186)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -566,7 +593,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(880, 312)</value>
+      <value>(984, 318)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -597,7 +624,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -609,7 +636,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(864, 188)</value>
+      <value>(968, 186)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -652,7 +679,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(912, 312)</value>
+      <value>(1016, 326)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -683,7 +710,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -695,7 +722,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(896, 188)</value>
+      <value>(992, 186)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -734,7 +761,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1072, 116)</value>
+      <value>(1104, 109)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -765,7 +792,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(272, 632)</value>
+      <value>(256, 629)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -903,7 +930,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 592)</value>
+      <value>(992, 589)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -994,7 +1021,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1049,7 +1076,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 320)</value>
+      <value>(1128, 318)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1080,7 +1107,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1092,7 +1119,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 196)</value>
+      <value>(1128, 194)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1166,7 +1193,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1217,7 +1244,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(928, 124)</value>
+      <value>(960, 37)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1279,7 +1306,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1291,7 +1318,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(904, 452)</value>
+      <value>(872, 450)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1425,7 +1452,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1571,7 +1598,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1583,7 +1610,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 764)</value>
+      <value>(1000, 762)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1622,7 +1649,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(968, 892)</value>
+      <value>(976, 893)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1789,7 +1816,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(96, 376)</value>
+      <value>(680, 387)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1841,7 +1868,7 @@
     </param>
     <param>
       <key>nmedian</key>
-      <value>4**5</value>
+      <value>4**6</value>
     </param>
   </block>
   <block>
@@ -1884,7 +1911,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(360, 408)</value>
+      <value>(56, 368)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1955,7 +1982,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(736, 52)</value>
+      <value>(784, 60)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1998,7 +2025,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(376, 52)</value>
+      <value>(400, 60)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2057,7 +2084,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(520, 32)</value>
+      <value>(560, 32)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2108,7 +2135,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(352, 172)</value>
+      <value>(432, 172)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2135,7 +2162,7 @@
     </param>
     <param>
       <key>bb_gain0</key>
-      <value>float(Gain3s)</value>
+      <value>float(Gain3)</value>
     </param>
     <param>
       <key>bw0</key>
@@ -2159,15 +2186,15 @@
     </param>
     <param>
       <key>if_gain0</key>
-      <value>float(Gain2s)</value>
+      <value>float(Gain2)</value>
     </param>
     <param>
       <key>iq_balance_mode0</key>
-      <value>0</value>
+      <value>2</value>
     </param>
     <param>
       <key>gain0</key>
-      <value>float(Gain1s)</value>
+      <value>float(Gain1)</value>
     </param>
     <param>
       <key>ant10</key>
@@ -3427,7 +3454,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(160, 0)</value>
+      <value>(160, -3)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3558,7 +3585,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(656, 433)</value>
+      <value>(312, 393)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3915,7 +3942,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(528, 220)</value>
+      <value>(640, 221)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4009,7 +4036,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(688, 220)</value>
+      <value>(808, 221)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4018,6 +4045,53 @@
     <param>
       <key>id</key>
       <value>ra_vmedian_0_1_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>fftsize</value>
+    </param>
+    <param>
+      <key>vdecimate</key>
+      <value>4</value>
+    </param>
+  </block>
+  <block>
+    <key>ra_vmedian</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(496, 285)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ra_vmedian_0_1_0_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -4104,13 +4178,19 @@
   </connection>
   <connection>
     <source_block_id>ra_vmedian_0_0_0</source_block_id>
+    <sink_block_id>Ra_Integrate_1</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vmedian_0_0_0</source_block_id>
     <sink_block_id>ra_vmedian_0_1_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>ra_vmedian_0_1</source_block_id>
-    <sink_block_id>ra_vmedian_0_0_0</sink_block_id>
+    <sink_block_id>ra_vmedian_0_1_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4121,8 +4201,8 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_1_0</source_block_id>
-    <sink_block_id>Ra_Integrate_1</sink_block_id>
+    <source_block_id>ra_vmedian_0_1_0_0</source_block_id>
+    <sink_block_id>ra_vmedian_0_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

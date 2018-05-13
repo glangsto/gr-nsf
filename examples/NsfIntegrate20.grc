@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.9'?>
 <flow_graph>
   <timestamp>Sun Mar 11 16:57:49 2018</timestamp>
   <block>
@@ -128,7 +128,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -214,11 +214,11 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
-      <value>6.E6</value>
+      <value>2.e6</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -251,6 +251,33 @@
     <param>
       <key>writeback</key>
       <value>Bandwidth</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(976, 61)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ConfigFile</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"Watch20.conf"</value>
     </param>
   </block>
   <block>
@@ -339,7 +366,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -425,7 +452,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -511,7 +538,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -597,7 +624,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -683,7 +710,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -994,7 +1021,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1080,11 +1107,11 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
-      <value>2048</value>
+      <value>1024</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1112,7 +1139,7 @@
     </param>
     <param>
       <key>type</key>
-      <value>real</value>
+      <value>int</value>
     </param>
     <param>
       <key>writeback</key>
@@ -1166,7 +1193,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1279,7 +1306,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1291,7 +1318,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(904, 452)</value>
+      <value>(872, 450)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1425,7 +1452,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1571,7 +1598,7 @@
     </param>
     <param>
       <key>config_file</key>
-      <value>Watch.conf</value>
+      <value>ConfigFile</value>
     </param>
     <param>
       <key>value</key>
@@ -1789,7 +1816,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(96, 376)</value>
+      <value>(680, 387)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1868,7 +1895,7 @@
     </param>
     <param>
       <key>count</key>
-      <value>(4**5)</value>
+      <value>(4**4)</value>
     </param>
     <param>
       <key>elevation</key>
@@ -1884,7 +1911,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(368, 372)</value>
+      <value>(56, 368)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2135,7 +2162,7 @@
     </param>
     <param>
       <key>bb_gain0</key>
-      <value>Gain3s</value>
+      <value>float(Gain3)</value>
     </param>
     <param>
       <key>bw0</key>
@@ -2143,7 +2170,7 @@
     </param>
     <param>
       <key>dc_offset_mode0</key>
-      <value>2</value>
+      <value>0</value>
     </param>
     <param>
       <key>corr0</key>
@@ -3558,7 +3585,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(576, 372)</value>
+      <value>(312, 393)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -4104,6 +4131,12 @@
   </connection>
   <connection>
     <source_block_id>ra_vmedian_0_0_0</source_block_id>
+    <sink_block_id>Ra_Integrate_1</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vmedian_0_0_0</source_block_id>
     <sink_block_id>ra_vmedian_0_1_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -4117,12 +4150,6 @@
   <connection>
     <source_block_id>ra_vmedian_0_1_0</source_block_id>
     <sink_block_id>Ra_Ascii_Sink_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ra_vmedian_0_1_0</source_block_id>
-    <sink_block_id>Ra_Integrate_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
