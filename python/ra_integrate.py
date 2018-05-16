@@ -132,6 +132,8 @@ class ra_integrate(gr.sync_block):
         self.startutc = now
         self.stoputc = now
         self.obs.utc = now
+        self.printutc = now 
+        self.printinterval = 5.  # print averages every few seconds
         print 'Setup File       : ',self.setupFile
         # prepare to start writing observations
         if not os.path.exists(self.obs.datadir):
@@ -511,14 +513,16 @@ class ra_integrate(gr.sync_block):
             vmed = statistics.median( avespec)
 
             label = radioastronomy.unitlabels[self.units]
-            if self.nave % 5 == 0:
+            dt = now - self.printutc
+            if dt.total_seconds() > self.printinterval:
                 if self.units == 0:
                     print "%s %5d Max %9.3f Min: %9.3f Median: %9.3f %s " % (yymmdd, self.nave, vmax, vmin, vmed, label)
                 elif self.units == 1:
                     print "%s %5d Max %9.3f Min: %9.3f Median: %9.3f %s " % (yymmdd, self.nave, vmax, vmin, vmed, label)
                 else: 
                     print "%s %5d Max %9.1f Min: %9.1f Median: %9.1f %s " % (yymmdd, self.nave, vmax, vmin, vmed, label)
-                sys.stdout.write("\033[F")              
+                sys.stdout.write("\033[F")
+                self.printutc = now
         # end for all input vectors
         return nout
     # end ra_integrate()
