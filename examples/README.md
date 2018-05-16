@@ -17,7 +17,10 @@ The '*.ast' files contain example spectral line observations.
 
 The '*.hot' files contains hot-load calibration observations.  The NsfIntegrate blocks can overwrite these files.
 
-The Watch.conf is a configuration file for the Nsf*.grc blocks
+Configuration files are used to record some input parameters and allow restarting tests and survey observations.
+
+1.  Watch60.conf is a configuration file for the NsfIntegrate60.grc AIRSPY 6.0 MHz observing block
+2.  Watch20.conf is a configuration file for the NsfIntegrate20.grc RTLSDR 2.0 MHz observing block
 
 The Watch.not is a *Note File* describing the astronomical setup.  This file also contains a spectrum observation,
 as the goal of the data header is to allow a complete re-observation, based on the previous header values.
@@ -39,6 +42,22 @@ Finally run the GRC files:
 or 
 
 `gnuradio-companion NsfIntegrate60.grc`
+
+### Optomizing operation
+
+The hardkernel.com Odriod XU4 octa-core processor can capture all AIRSPY 6 MHz data if the 2 GHz processors are selected.  After recreating the design on your local computer using GRC, then exit and run python from the command line.
+
+The linux 'taskset' command can be used to select the 2 GHz processors (number 4,5,6 and 7):
+
+`taskset -c 4,5,6,7 python NsfIntegrate60.py`
+
+You can use the _top_ command to see which processes are using the CPU on your computer.
+
+Move all the other processors with the taskset commands like:
+
+`taskset -pc 0 <process-id>`
+
+Where <process-id> is one of the higher cpu usage processes on your device.
 
 ### Example data, formated:
 
