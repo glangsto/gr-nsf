@@ -55,9 +55,9 @@ You can use the _top_ command to see which processes are using the CPU on your c
 
 Move all the other processors with the taskset commands like:
 
-`taskset -pc 0 <process-id>`
+`taskset -pc 0 process-id`
 
-Where <process-id> is one of the higher cpu usage processes on your device.
+Where process-id is one of the higher cpu usage processes on your device.
 
 ### Example data, formated:
 

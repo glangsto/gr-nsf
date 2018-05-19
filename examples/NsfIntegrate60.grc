@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.9'?>
+<?grc format='1' created='3.7.11'?>
 <flow_graph>
   <timestamp>Sun Mar 11 16:57:49 2018</timestamp>
   <block>
@@ -456,7 +456,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1420.406e6</value>
+      <value>1419.5e6</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1033,7 +1033,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1064, 444)</value>
+      <value>(800, 660)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1318,7 +1318,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(872, 450)</value>
+      <value>(800, 532)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1464,7 +1464,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 652)</value>
+      <value>(800, 396)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1784,7 +1784,7 @@
     </param>
     <param>
       <key>bandwidth</key>
-      <value>Bandwidths</value>
+      <value>Bandwidth</value>
     </param>
     <param>
       <key>alias</key>
@@ -1800,7 +1800,7 @@
     </param>
     <param>
       <key>device</key>
-      <value>rtlsdr,bias=1</value>
+      <value>Device</value>
     </param>
     <param>
       <key>elevation</key>
@@ -1812,11 +1812,11 @@
     </param>
     <param>
       <key>frequency</key>
-      <value>Frequencys</value>
+      <value>Frequency</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(680, 387)</value>
+      <value>(544, 384)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1824,15 +1824,15 @@
     </param>
     <param>
       <key>gain1</key>
-      <value>14</value>
+      <value>Gain1</value>
     </param>
     <param>
       <key>gain2</key>
-      <value>11</value>
+      <value>Gain2</value>
     </param>
     <param>
       <key>gain3</key>
-      <value>11</value>
+      <value>Gain3</value>
     </param>
     <param>
       <key>id</key>
@@ -1856,7 +1856,7 @@
     </param>
     <param>
       <key>site</key>
-      <value>Moumau House</value>
+      <value>Telescope</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1879,7 +1879,7 @@
     </param>
     <param>
       <key>bandwidth</key>
-      <value>Bandwidths</value>
+      <value>Bandwidth</value>
     </param>
     <param>
       <key>alias</key>
@@ -1895,7 +1895,7 @@
     </param>
     <param>
       <key>count</key>
-      <value>(4**5)</value>
+      <value>(4**6)</value>
     </param>
     <param>
       <key>elevation</key>
@@ -1907,11 +1907,11 @@
     </param>
     <param>
       <key>frequency</key>
-      <value>Frequencys</value>
+      <value>Frequency</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(56, 368)</value>
+      <value>(96, 372)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1935,7 +1935,7 @@
     </param>
     <param>
       <key>observers</key>
-      <value>Science Afficionados</value>
+      <value>observer</value>
     </param>
     <param>
       <key>obstype</key>
@@ -1982,7 +1982,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(784, 60)</value>
+      <value>(792, 52)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2025,7 +2025,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(400, 60)</value>
+      <value>(400, 52)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2116,7 +2116,7 @@
     </param>
     <param>
       <key>window</key>
-      <value>window.blackmanharris(fftsize)</value>
+      <value>window.hamming(fftsize)</value>
     </param>
   </block>
   <block>
@@ -3585,7 +3585,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(312, 393)</value>
+      <value>(312, 372)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3942,7 +3942,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(640, 221)</value>
+      <value>(640, 196)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4036,7 +4036,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(808, 221)</value>
+      <value>(816, 196)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4083,7 +4083,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(496, 285)</value>
+      <value>(544, 284)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4178,12 +4178,6 @@
   </connection>
   <connection>
     <source_block_id>ra_vmedian_0_0_0</source_block_id>
-    <sink_block_id>Ra_Integrate_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ra_vmedian_0_0_0</source_block_id>
     <sink_block_id>ra_vmedian_0_1_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
@@ -4197,6 +4191,12 @@
   <connection>
     <source_block_id>ra_vmedian_0_1_0</source_block_id>
     <sink_block_id>Ra_Ascii_Sink_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vmedian_0_1_0</source_block_id>
+    <sink_block_id>Ra_Integrate_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
