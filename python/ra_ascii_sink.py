@@ -213,6 +213,7 @@ class ra_ascii_sink(gr.sync_block):
         if record == radioastronomy.INTWAIT: 
             print "Stop  Recording  : ", strnow
             self.startutc = now
+            self.obs.writecount = 0
         # if changing state from recording to not recording
         elif self.record == radioastronomy.INTWAIT and record != radioastronomy.INTWAIT:
             print "Start Recording  : ", strnow
