@@ -2,6 +2,7 @@
 Class defining a Radio Frequency Spectrum
 Includes reading and writing ascii files
 HISTORY
+18MAY20 GIL code cleanup
 18APR18 GIL add NAVE to save complete obsevering setup
 18MAR10 GIL add labels for different integration types
 18APR01 GIL add labels for different observing types
@@ -15,9 +16,8 @@ HISTORY
 # Imports
 ##################################################
 import datetime
-import numpy
 import copy
-import angles
+import numpy
 try:
     import ephem
 except ImportError:
@@ -29,31 +29,33 @@ except ImportError:
     print ''
     exit()
 
+import angles
+
 MAXCHAN = 1024
 OBSSURVEY = 0
 OBSHOT = 1
 OBSCOLD = 2
 OBSREF = 3
 NOBSTYPES = 4
-obstypes = [ OBSSURVEY, OBSHOT, OBSCOLD, OBSREF]
-obslabels = [ 'SURVEY', 'HOT', 'COLD', 'REFERENCE' ]
+obstypes = [OBSSURVEY, OBSHOT, OBSCOLD, OBSREF]
+obslabels = ['SURVEY', 'HOT', 'COLD', 'REFERENCE']
 # flags for recording state (either wait or record)
 INTWAIT = 0
 INTRECORD = 1
 INTSAVE = 2
 NINTTYPES = 3
-intlabels = [ 'WAIT', 'RECORD', 'SAVE']
+intlabels = ['WAIT', 'RECORD', 'SAVE']
 # Units for calibration
 UNITCOUNTS = 0
 UNITDB = 1
 UNITKELVIN = 2
 UNITJANSKY = 3
 NUNITTYPES = 4
-units = [ UNITCOUNTS, UNITDB, UNITKELVIN, UNITJANSKY]
-unitlabels = [ 'Counts', 'Power (dB)', 'Kelvin', 'Jansky']
+units = [UNITCOUNTS, UNITDB, UNITKELVIN, UNITJANSKY]
+unitlabels = ['Counts', 'Power (dB)', 'Kelvin', 'Jansky']
 
 ### average two utcs using the strange steps required by datetime
-def aveutcs( utc1, utc2):
+def aveutcs(utc1, utc2):
     """
     Ave Utcs takes as input two utc time and returns the average of these utcs
     Input and output 1st output are in datetime format.  The second output
@@ -71,7 +73,7 @@ def aveutcs( utc1, utc2):
     duration = dt.total_seconds()
     dt2 = dt/2
     # compute the average time of obs
-    utcout  = utc1 + dt2
+    utcout = utc1 + dt2
     return (utcout, duration)
 
 ###
@@ -81,64 +83,64 @@ def aveutcs( utc1, utc2):
 def iplatlon():
     """
     iplatlon() uses the ip address to get the latitude and longitude
-    The latitude and longitude are only rough, but usually 
+    The latitude and longitude are only rough, but usually
     better han 100 km accuracy.  This is good enough for small antennas.
     """
     # default values for Green Bank, WV
-    City = 'Green Bank'
-    Region = 'West Virginia'
-    Country = 'USA'
-    lon = float( -79.8)
-    lat = float( +38.4)
+    city = 'Green Bank'
+    region = 'West Virginia'
+    country = 'USA'
+    lon = float(-79.8)
+    lat = float(+38.4)
     try:
         import re
         import json
         from urllib2 import urlopen
-    except:
+    except ImportError:
         print 'Can not find Python code for:'
         print 'import re'
         print 'import json'
         print 'from urllib2 import urlopen'
         # returning Green bank
-        return City, Region, Country, lat, lon
+        return city, region, country, lat, lon
 
     try:
         data = str(urlopen('http://checkip.dyndns.com/').read())
     except:
         print 'Can not open internet access to get Location'
         # returning Green bank
-        return City, Region, Country, lat, lon
+        return city, region, country, lat, lon
 
     try:
         IP = re.compile(r'(\d+.\d+.\d+.\d+)').search(data).group(1)
     except:
         print 'Can not parse ip string'
-        return City, Region, Country, lat, lon
+        return city, region, country, lat, lon
     try:
         url = 'http://ipinfo.io/' + IP + '/json'
         response = urlopen(url)
         data = json.load(response)
     except:
         print 'Can not get ip location from internet'
-        return City, Region, Country, lat, lon
+        return city, region, country, lat, lon
 
-    org=data['org']
-    City = data['city']
-    Country=data['country']
-    Region=data['region']
+    org = data['org']
+    city = data['city']
+    country = data['country']
+    region = data['region']
 
     loc = data['loc']
     locs = loc.split(',')
-    lat = float( locs[0])
-    lon = float( locs[1])
+    lat = float(locs[0])
+    lon = float(locs[1])
 
     print '\nYour IP details: '
     print 'IP       : {0} '.format(IP)
-    print 'Region   : {0}; Country : {1}'.format(Region, Country)
-    print 'City     : {0}'.format(City)
+    print 'Region   : {0}; Country : {1}'.format(region, country)
+    print 'City     : {0}'.format(city)
     print 'Org      : {0}'.format(org)
-    print 'Latitude : ',lat,';  Longitude: ',lon
-    return City, Region, Country, lat, lon
+    print 'Latitude : ', lat, ';  Longitude: ', lon
+    return city, region, country, lat, lon
 
 def degree2float(instring, hint):
     """
@@ -279,7 +281,7 @@ class Spectrum(object):
         Compute the ra,dec (J2000) from Az,El location and time
         """
         rads = numpy.pi / 180.
-        radec2000 = ephem.Equatorial( rads*self.ra, rads*self.dec, epoch=ephem.J2000)
+        radec2000 = ephem.Equatorial(rads*self.ra, rads*self.dec, epoch=ephem.J2000)
         # to convert to dec degrees need to replace on : with d
         self.epoch = "2000"
         gal = ephem.Galactic(radec2000)
@@ -312,7 +314,7 @@ class Spectrum(object):
 #        print fmt % (datestr, lst, self.lst, self.telaz, self.telel)
         radec = ephem.Equatorial(ra_a, dec_a, epoch=datestr)
 #        print 'Ra,Dec %s,%s for %s' % (radec.ra, radec.dec, radec.epoch)
-        radec2000 = ephem.Equatorial( radec, epoch=ephem.J2000)
+        radec2000 = ephem.Equatorial(radec, epoch=ephem.J2000)
 #        print 'Ra,Dec %s,%s for %s' % (radec2000.ra, radec2000.dec, radec2000.epoch)
         # Hours
         aparts = angles.phmsdms(str(radec2000.ra))
@@ -424,7 +426,7 @@ class Spectrum(object):
         nSpec = self.nSpec
         outline = '# NSPEC     = '  + str(nSpec) + '\n'
         outfile.write(outline)
-        nave  = self.nave
+        nave = self.nave
         outline = '# NAVE      = '  + str(nave) + '\n'
         outfile.write(outline)
         nmedian = self.nmedian
@@ -485,7 +487,7 @@ class Spectrum(object):
         x = self.centerFreqHz - (self.bandwidthHz/2.) + (dx/2.)
         yv = self.ydataA
         leny = len(yv)
-        for i in range(min(self.nChan,leny)):
+        for i in range(min(self.nChan, leny)):
             outline = str(i).zfill(4) + ' ' + str(long(x)) + ' ' + str(yv[i]) + '\n'
             outfile.write(outline)
             x = x + dx
@@ -520,7 +522,7 @@ class Spectrum(object):
         # Read the file.
         f2 = open(fullname, 'r')
 # read the whole file into a single variable, which is a list of every row of the file.
-        lines = f2.readlines()
+        inlines = f2.readlines()
         f2.close()
 
 # initialize some variable to be lists:
@@ -531,7 +533,7 @@ class Spectrum(object):
         linecount = 0
 
 # scan the rows of the file stored in lines, and put the values into some variables:
-        for line in lines:
+        for line in inlines:
             parts = line.split()
             if linecount == 0:
                 parts[1] = parts[1].upper()
@@ -569,7 +571,7 @@ class Spectrum(object):
                     lstparts = angles.phmsdms(parts[3])
                     x = angles.sexa2deci(lstparts['sign'], *lstparts['vals'])
                     self.lst = x*15. # convert back to degrees
-                    if verbose: 
+                    if verbose:
                         print parts[3], x
                 if parts[1] == 'AZ':
                     self.telaz = degree2float(parts[3], parts[1])
@@ -602,45 +604,47 @@ class Spectrum(object):
                     self.etaB = float(parts[3])
                 if parts[1] == 'POLANGLE':
                     self.polAngle = float(parts[3])
-                if parts[1] == 'LNA' or parts[1] == 'GAINS':  # get one or more gains separated by ';'
+                # get one or more gains separated by ';'
+                if parts[1] == 'LNA' or parts[1] == 'GAINS':
                     gains = []
                     for jjj in range(3, len(parts)):
                         gainstr = parts[jjj].replace(';', ' ')
                         gainstr = gainstr.replace(',', ' ')
                         moreparts = gainstr.split()
-                        for kkk in range(len(moreparts)):
-                            gains.append(float(moreparts[kkk]))
+                        for kkk in moreparts:
+                            gains.append(float(kkk))
                     if verbose:
                         print 'read: parts: ', parts
                         print 'read: gains: ', gains
                     self.gains = numpy.array(gains)
-                if parts[1] == 'LNA=' or parts[1] == 'GAINS=':  # get one or more gains separated by ';'
+                    # get one or more gains separated by ';'
+                if parts[1] == 'LNA=' or parts[1] == 'GAINS=':
                     gains = []
                     for jjj in range(2, len(parts)):
                         gainstr = parts[jjj].replace(';', ' ')
                         gainstr = gainstr.replace(',', ' ')
                         moreparts = gainstr.split()
-                        for kkk in range(len(moreparts)):
-                            gains.append(float(moreparts[kkk]))
+                        for kkk in moreparts:
+                            gains.append(float(kkk))
                     self.gains = numpy.array(gains)
                 apart = parts[1]
                 if apart[0:3] == 'GAIN':
-                    i = int( apart[4])
+                    i = int(apart[4])
                     if i > 0 and i < 6:
-                        n = len( parts)
-                        self.gains[i-1] = float( parts[n-1])
+                        n = len(parts)
+                        self.gains[i-1] = float(parts[n-1])
                     else:
                         if apart[4] != 'S':
-                           print "Error parsing GAINn: ", line 
+                            print "Error parsing GAINn: ", line
                 if parts[1] == 'OBSERVER':
                     otherparts = line.split('=')
-                    self.observer = str( otherparts[1]).strip()
+                    self.observer = str(otherparts[1]).strip()
                     if verbose:
                         print 'Observer: ', self.observer
                 if parts[1] == 'DEVICE':
                     otherparts = line.split('=', 1)
                     if len(otherparts) > 1:
-                        self.device = str( otherparts[1]).strip()
+                        self.device = str(otherparts[1]).strip()
                     else:
                         print 'Error parsing device : ', line
                     if verbose:
@@ -648,53 +652,53 @@ class Spectrum(object):
                 if parts[1] == 'DATADIR':
                     otherparts = line.split('=', 1)
                     if len(otherparts) > 1:
-                        self.datadir = str( otherparts[1]).strip()
+                        self.datadir = str(otherparts[1]).strip()
                     else:
                         print 'Error parsing datadir : ', line
                     if verbose:
                         print 'DataDir : ', self.datadir
                 if parts[1] == 'SITE':
                     otherparts = line.split('=')
-                    self.site = str( otherparts[1]).strip()
+                    self.site = str(otherparts[1]).strip()
                     if verbose:
                         print 'Site    : ', self.site
                 if parts[1] == 'CITY':
                     otherparts = line.split('=')
-                    self.city = str( otherparts[1]).strip()
+                    self.city = str(otherparts[1]).strip()
                     if verbose:
                         print 'City    : ', self.city
                 if parts[1] == 'REGION':
                     otherparts = line.split('=')
-                    self.region = str( otherparts[1]).strip()
+                    self.region = str(otherparts[1]).strip()
                     if verbose:
                         print 'Region  : ', self.region
                 if parts[1] == 'COUNTRY':
                     otherparts = line.split('=')
-                    self.country = str( otherparts[1]).strip()
+                    self.country = str(otherparts[1]).strip()
                     if verbose:
                         print 'Country : ', self.country
                 if parts[1] == 'NOTEA':
                     otherparts = line.split('=')
-                    self.noteA = str( otherparts[1]).strip()
+                    self.noteA = str(otherparts[1]).strip()
                     if verbose:
                         print 'Note A  : ', self.noteA
                 if parts[1] == 'NOTEB':
                     otherparts = line.split('=')
-                    self.noteB = str( otherparts[1]).strip()
+                    self.noteB = str(otherparts[1]).strip()
                     if verbose:
                         print 'Note B  : ', self.noteB
                 if parts[1] == 'AST_VERS':
                     otherparts = line.split('=')
                     if verbose:
-                        self.version = str( otherparts[1]).strip()
+                        self.version = str(otherparts[1]).strip()
                 if parts[1] == 'FRAME':
                     otherparts = line.split('=')
-                    self.frame = str( otherparts[1]).strip()
+                    self.frame = str(otherparts[1]).strip()
                     if verbose:
                         print 'FRAME  : ', self.frame
                 if parts[1] == 'TELTYPE':
                     otherparts = line.split('=')
-                    self.telType = str( otherparts[1]).strip()
+                    self.telType = str(otherparts[1]).strip()
                     if verbose:
                         print 'Tel Type: ', self.telType
                 if parts[1] == 'LON' or parts[1] == 'GALLON':
@@ -739,21 +743,21 @@ class Spectrum(object):
             datacount = datacount+1
             p = line.split()
             np = len(p)
-            if (np < 3):
+            if np < 3:
                 continue
             try:
                 x1.append(float(p[1]))
             except:
-                x1.append( 0.0)
+                x1.append(0.0)
             try:
                 y1.append(float(p[2]))
             except:
-                y1.append( 0.0)
+                y1.append(0.0)
             if self.nSpec > 1:
                 try:
                     y2.append(float(p[3]))
                 except:
-                    y2.append( 0.0)
+                    y2.append(0.0)
 
 # at this point all data and header keywords are read
         self.xdata = numpy.array(x1)  # transfer
@@ -768,7 +772,7 @@ class Spectrum(object):
             self.nChan = int(ndata)
         return
 
-    def foldfrequency( self):
+    def foldfrequency(self):
         """
         foldfrequency flips and averages the folded xaxis
         """
@@ -779,7 +783,7 @@ class Spectrum(object):
         yfold = yfold
         return yfold
 
-def lines( linelist, lineWidth, x, y):
+def lines(linelist, lineWidth, x, y):
     """
     lines takes a list of lines to interpoate, interpolates over the RFI
     linelistHz list of line frequencies
@@ -788,8 +792,8 @@ def lines( linelist, lineWidth, x, y):
     y = intensities
     """
 
-    nline = len( linelist) 
-    nwidth = len( lineWidth)  # use last value if more lines than widths
+    nline = len(linelist) 
+    nwidth = len(lineWidth)  # use last value if more lines than widths
 
     nx = len(x)
     nx2 = int(nx/2)
@@ -802,14 +806,14 @@ def lines( linelist, lineWidth, x, y):
     
     increasing = x[nx2+1] > x[nx2]
 
-    for jjj in range( nline): # for all iines
+    for jjj in range(nline): # for all iines
         
         # find line position
         nu = linelist[jjj]
         if nwidth == 1:
             nwidth = lineWidth 
         else:
-            nwidth = lineWidth[min(jjj,nwidth-1)]
+            nwidth = lineWidth[min(jjj, nwidth-1)]
         nwidth2 = max(1, nwidth/2)
         iline = 0
 
@@ -822,7 +826,7 @@ def lines( linelist, lineWidth, x, y):
                 if x[iii] >= nu and nu > x[iii+1]:
                     iline = iii+1
                     break
-        
+
         if iline == 0:       # if line not in data
             continue
 
@@ -833,7 +837,7 @@ def lines( linelist, lineWidth, x, y):
 # if here found the line
         ya = y[iline-nwidth2]
         yb = y[iline+nwidth2]
-        for iii in range( 0, nwidth):
+        for iii in range(0, nwidth):
             kkk = iii+iline-nwidth2
             yout[kkk] = ((ya * (nwidth-iii)) + (yb * iii))/float(nwidth)
 #            print 'Line %d: %f,%f' % (kkk, y[kkk], yout[kkk])
@@ -857,7 +861,7 @@ def lines( linelist, lineWidth, x, y):
 
 # File: 18-02-10T201333.ast
 # NOTEA     = ubuntu linux new bubble horn with lid
-# NOTEB     = 
+# NOTEB     = Test of code
 # OBSERVER  = Glen Langston
 # SITE      = Moumau House
 # CITY      = Green Bank
