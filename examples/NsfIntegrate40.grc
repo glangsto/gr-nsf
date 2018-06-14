@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>NsfIntegrate60</value>
+      <value>NsfIntegrate40</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -218,7 +218,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>6.e6</value>
+      <value>4.e6</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -226,7 +226,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 756)</value>
+      <value>(680, 898)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -277,7 +277,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>"Watch60.conf"</value>
+      <value>"Watch40.conf"</value>
     </param>
   </block>
   <block>
@@ -296,7 +296,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 944)</value>
+      <value>(232, 894)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -464,7 +464,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 620)</value>
+      <value>(536, 898)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -507,7 +507,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(408, 950)</value>
+      <value>(392, 918)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -620,7 +620,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(160, 629)</value>
+      <value>(16, 629)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -719,7 +719,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 872)</value>
+      <value>(232, 822)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -758,7 +758,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(144, 829)</value>
+      <value>(0, 829)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1003,7 +1003,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(408, 854)</value>
+      <value>(400, 822)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1136,7 +1136,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(408, 758)</value>
+      <value>(392, 726)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1249,7 +1249,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 792)</value>
+      <value>(232, 742)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1335,7 +1335,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(272, 719)</value>
+      <value>(128, 719)</value>
     </param>
     <param>
       <key>gui_hint</key>

@@ -5,7 +5,7 @@
 # Title: NsfIntegrate: Average+Record Astronomical Obs.
 # Author: Glen Langston
 # Description: Test of Radio Astronomy Ascii Sink Block
-# Generated: Thu Jun 14 15:50:03 2018
+# Generated: Thu Jun 14 15:56:07 2018
 ##################################################
 
 if __name__ == '__main__':
@@ -39,7 +39,7 @@ import sys
 import time
 
 
-class NsfIntegrate60(gr.top_block, Qt.QWidget):
+class NsfIntegrate40(gr.top_block, Qt.QWidget):
 
     def __init__(self):
         gr.top_block.__init__(self, "NsfIntegrate: Average+Record Astronomical Obs.")
@@ -61,13 +61,13 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate60")
+        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate40")
         self.restoreGeometry(self.settings.value("geometry").toByteArray())
 
         ##################################################
         # Variables
         ##################################################
-        self.ConfigFile = ConfigFile = "Watch60.conf"
+        self.ConfigFile = ConfigFile = "Watch40.conf"
         self._Frequencys_config = ConfigParser.ConfigParser()
         self._Frequencys_config.read(ConfigFile)
         try: Frequencys = self._Frequencys_config.getfloat("main", "Frequency")
@@ -76,7 +76,7 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         self._Bandwidths_config = ConfigParser.ConfigParser()
         self._Bandwidths_config.read(ConfigFile)
         try: Bandwidths = self._Bandwidths_config.getfloat("main", "Bandwidth")
-        except: Bandwidths = 6.e6
+        except: Bandwidths = 4.e6
         self.Bandwidths = Bandwidths
         self._fftsize_save_config = ConfigParser.ConfigParser()
         self._fftsize_save_config.read(ConfigFile)
@@ -369,7 +369,7 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         self.connect((self.ra_vmedian_5, 0), (self.Ra_Integrate_1, 0))    
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate60")
+        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate40")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
 
@@ -385,24 +385,12 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         	self._Azimuth_save_config.add_section("main")
         self._Azimuth_save_config.set("main", "azimuth", str(self.Azimuth))
         self._Azimuth_save_config.write(open(self.ConfigFile, 'w'))
-        self._Bandwidths_config = ConfigParser.ConfigParser()
-        self._Bandwidths_config.read(self.ConfigFile)
-        if not self._Bandwidths_config.has_section("main"):
-        	self._Bandwidths_config.add_section("main")
-        self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
-        self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
         self._Elevation_save_config = ConfigParser.ConfigParser()
         self._Elevation_save_config.read(self.ConfigFile)
         if not self._Elevation_save_config.has_section("main"):
         	self._Elevation_save_config.add_section("main")
         self._Elevation_save_config.set("main", "elevation", str(self.Elevation))
         self._Elevation_save_config.write(open(self.ConfigFile, 'w'))
-        self._Frequencys_config = ConfigParser.ConfigParser()
-        self._Frequencys_config.read(self.ConfigFile)
-        if not self._Frequencys_config.has_section("main"):
-        	self._Frequencys_config.add_section("main")
-        self._Frequencys_config.set("main", "Frequency", str(self.Frequency))
-        self._Frequencys_config.write(open(self.ConfigFile, 'w'))
         self._Gain1s_config = ConfigParser.ConfigParser()
         self._Gain1s_config.read(self.ConfigFile)
         if not self._Gain1s_config.has_section("main"):
@@ -457,6 +445,18 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         	self._xaxis_save_0_config.add_section("main")
         self._xaxis_save_0_config.set("main", "Xaxis", str(self.Xaxis))
         self._xaxis_save_0_config.write(open(self.ConfigFile, 'w'))
+        self._Frequencys_config = ConfigParser.ConfigParser()
+        self._Frequencys_config.read(self.ConfigFile)
+        if not self._Frequencys_config.has_section("main"):
+        	self._Frequencys_config.add_section("main")
+        self._Frequencys_config.set("main", "Frequency", str(self.Frequency))
+        self._Frequencys_config.write(open(self.ConfigFile, 'w'))
+        self._Bandwidths_config = ConfigParser.ConfigParser()
+        self._Bandwidths_config.read(self.ConfigFile)
+        if not self._Bandwidths_config.has_section("main"):
+        	self._Bandwidths_config.add_section("main")
+        self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
+        self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
 
     def get_Frequencys(self):
         return self.Frequencys
@@ -484,36 +484,36 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
 
     def set_Frequency(self, Frequency):
         self.Frequency = Frequency
+        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
+        self.Ra_Ascii_Sink_0.set_frequency( self.Frequency)
+        self.osmosdr_source_0.set_center_freq(self.Frequency, 0)
+        Qt.QMetaObject.invokeMethod(self._Frequency_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Frequency)))
         self._Frequencys_config = ConfigParser.ConfigParser()
         self._Frequencys_config.read(self.ConfigFile)
         if not self._Frequencys_config.has_section("main"):
         	self._Frequencys_config.add_section("main")
         self._Frequencys_config.set("main", "Frequency", str(self.Frequency))
         self._Frequencys_config.write(open(self.ConfigFile, 'w'))
-        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
-        self.Ra_Ascii_Sink_0.set_frequency( self.Frequency)
         self.Ra_Integrate_1.set_frequency( self.Frequency)
-        self.osmosdr_source_0.set_center_freq(self.Frequency, 0)
-        Qt.QMetaObject.invokeMethod(self._Frequency_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Frequency)))
 
     def get_Bandwidth(self):
         return self.Bandwidth
 
     def set_Bandwidth(self, Bandwidth):
         self.Bandwidth = Bandwidth
+        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
+        self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
+        self.Ra_Ascii_Sink_0.set_bandwidth( self.Bandwidth)
+        self.osmosdr_source_0.set_sample_rate(self.Bandwidth)
+        self.osmosdr_source_0.set_bandwidth(self.Bandwidth, 0)
+        Qt.QMetaObject.invokeMethod(self._Bandwidth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Bandwidth)))
+        self.Ra_Integrate_1.set_bandwidth( self.Bandwidth)
         self._Bandwidths_config = ConfigParser.ConfigParser()
         self._Bandwidths_config.read(self.ConfigFile)
         if not self._Bandwidths_config.has_section("main"):
         	self._Bandwidths_config.add_section("main")
         self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
         self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
-        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
-        self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
-        self.Ra_Ascii_Sink_0.set_bandwidth( self.Bandwidth)
-        self.Ra_Integrate_1.set_bandwidth( self.Bandwidth)
-        self.osmosdr_source_0.set_sample_rate(self.Bandwidth)
-        self.osmosdr_source_0.set_bandwidth(self.Bandwidth, 0)
-        Qt.QMetaObject.invokeMethod(self._Bandwidth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Bandwidth)))
 
     def get_xaxis_save(self):
         return self.xaxis_save
@@ -649,17 +649,17 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
     def set_units(self, units):
         self.units = units
         self._units_callback(self.units)
-        self.Ra_Integrate_1.set_units( self.units)
         self.qtgui_vector_sink_f_0_0.set_y_axis(self.ymins[self.units], self.ymaxs[self.units])
         self.qtgui_vector_sink_f_0_0.set_ref_level(0.5*(self.ymins[self.units] + self.ymaxs[self.units]))
+        self.Ra_Integrate_1.set_units( self.units)
 
     def get_obstype(self):
         return self.obstype
 
     def set_obstype(self, obstype):
         self.obstype = obstype
-        self._obstype_callback(self.obstype)
         self.Ra_Ascii_Sink_0.set_obstype( self.obstype)
+        self._obstype_callback(self.obstype)
         self.Ra_Integrate_1.set_obstype( self.obstype)
 
     def get_observer(self):
@@ -674,8 +674,8 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         self._observers_save_config.set("main", "observers", str(self.observer))
         self._observers_save_config.write(open(self.ConfigFile, 'w'))
         self.Ra_Ascii_Sink_0.set_observers( self.observer)
-        self.Ra_Integrate_1.set_observers( self.observer)
         Qt.QMetaObject.invokeMethod(self._observer_line_edit, "setText", Qt.Q_ARG("QString", str(self.observer)))
+        self.Ra_Integrate_1.set_observers( self.observer)
 
     def get_nAve(self):
         return self.nAve
@@ -716,13 +716,13 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
 
     def set_VelFrame(self, VelFrame):
         self.VelFrame = VelFrame
-        self._VelFrame_callback(self.VelFrame)
         self._frame_save_config = ConfigParser.ConfigParser()
         self._frame_save_config.read(self.ConfigFile)
         if not self._frame_save_config.has_section("main"):
         	self._frame_save_config.add_section("main")
         self._frame_save_config.set("main", "Frame", str(self.VelFrame))
         self._frame_save_config.write(open(self.ConfigFile, 'w'))
+        self._VelFrame_callback(self.VelFrame)
 
     def get_Telescope(self):
         return self.Telescope
@@ -743,8 +743,8 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
 
     def set_Record(self, Record):
         self.Record = Record
-        self._Record_callback(self.Record)
         self.Ra_Ascii_Sink_0.set_record( self.Record)
+        self._Record_callback(self.Record)
         self.Ra_Integrate_1.set_inttype( self.Record)
 
     def get_Gain1(self):
@@ -774,8 +774,8 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         self._Elevation_save_config.set("main", "elevation", str(self.Elevation))
         self._Elevation_save_config.write(open(self.ConfigFile, 'w'))
         self.Ra_Ascii_Sink_0.set_elevation( self.Elevation)
-        self.Ra_Integrate_1.set_elevation( self.Elevation)
         Qt.QMetaObject.invokeMethod(self._Elevation_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Elevation)))
+        self.Ra_Integrate_1.set_elevation( self.Elevation)
 
     def get_Device(self):
         return self.Device
@@ -803,11 +803,11 @@ class NsfIntegrate60(gr.top_block, Qt.QWidget):
         self._Azimuth_save_config.set("main", "azimuth", str(self.Azimuth))
         self._Azimuth_save_config.write(open(self.ConfigFile, 'w'))
         self.Ra_Ascii_Sink_0.set_azimuth( self.Azimuth)
-        self.Ra_Integrate_1.set_azimuth( self.Azimuth)
         Qt.QMetaObject.invokeMethod(self._Azimuth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Azimuth)))
+        self.Ra_Integrate_1.set_azimuth( self.Azimuth)
 
 
-def main(top_block_cls=NsfIntegrate60, options=None):
+def main(top_block_cls=NsfIntegrate40, options=None):
 
     from distutils.version import StrictVersion
     if StrictVersion(Qt.qVersion()) >= StrictVersion("4.5.0"):
