@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.9'?>
+<?grc format='1' created='3.7.12'?>
 <flow_graph>
   <timestamp>Sun Mar 11 16:57:49 2018</timestamp>
   <block>
@@ -73,12 +73,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value>NsfIntegrate: Average+Record Astronomical Obs.</value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -312,7 +320,7 @@
     </param>
     <param>
       <key>label</key>
-      <value>Device</value>
+      <value>Dev</value>
     </param>
     <param>
       <key>type</key>
@@ -511,7 +519,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>0,7,1,1</value>
+      <value>2,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -550,7 +558,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 186)</value>
+      <value>(952, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -575,178 +583,6 @@
     <param>
       <key>writeback</key>
       <value>Gain1</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_entry</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>Gain2s</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(984, 318)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>1,7,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>Gain2</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Gain2</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>real</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_config</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>config_file</key>
-      <value>ConfigFile</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>11</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(968, 186)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>Gain2s</value>
-    </param>
-    <param>
-      <key>option</key>
-      <value>gain2</value>
-    </param>
-    <param>
-      <key>section</key>
-      <value>main</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>real</value>
-    </param>
-    <param>
-      <key>writeback</key>
-      <value>Gain2</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_qtgui_entry</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>Gain3s</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1016, 326)</value>
-    </param>
-    <param>
-      <key>gui_hint</key>
-      <value>2,7,1,1</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>Gain3</value>
-    </param>
-    <param>
-      <key>label</key>
-      <value>Gain3</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>real</value>
-    </param>
-  </block>
-  <block>
-    <key>variable_config</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>config_file</key>
-      <value>ConfigFile</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>11</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(992, 186)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>Gain3s</value>
-    </param>
-    <param>
-      <key>option</key>
-      <value>gain3</value>
-    </param>
-    <param>
-      <key>section</key>
-      <value>main</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>real</value>
-    </param>
-    <param>
-      <key>writeback</key>
-      <value>Gain3</value>
     </param>
   </block>
   <block>
@@ -796,7 +632,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>0,0,1,2</value>
+      <value>0,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -828,7 +664,7 @@
     </param>
     <param>
       <key>label</key>
-      <value>Record</value>
+      <value>Rec</value>
     </param>
     <param>
       <key>labels</key>
@@ -922,6 +758,105 @@
     </param>
     <param>
       <key>value</key>
+      <value>frame_save</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(208, 824)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>12,0,1,2</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>VelFrame</value>
+    </param>
+    <param>
+      <key>label0</key>
+      <value>Topocentric</value>
+    </param>
+    <param>
+      <key>label1</key>
+      <value>LSRK</value>
+    </param>
+    <param>
+      <key>label2</key>
+      <value>Barycentric</value>
+    </param>
+    <param>
+      <key>label3</key>
+      <value></value>
+    </param>
+    <param>
+      <key>label4</key>
+      <value></value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Frame</value>
+    </param>
+    <param>
+      <key>labels</key>
+      <value>[]</value>
+    </param>
+    <param>
+      <key>num_opts</key>
+      <value>3</value>
+    </param>
+    <param>
+      <key>option0</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>option1</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>option2</key>
+      <value>2</value>
+    </param>
+    <param>
+      <key>option3</key>
+      <value>3</value>
+    </param>
+    <param>
+      <key>option4</key>
+      <value>4</value>
+    </param>
+    <param>
+      <key>options</key>
+      <value>[0, 1, 2]</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.QVBoxLayout</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>combo_box</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_chooser</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
       <value>xaxis_save</value>
     </param>
     <param>
@@ -930,11 +865,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(992, 589)</value>
+      <value>(992, 584)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>11,3,1,3</value>
+      <value>12,3,1,2</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1080,7 +1015,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>2,3,1,1</value>
+      <value>1,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1147,6 +1082,53 @@
     </param>
   </block>
   <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>ConfigFile</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1152, 412)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>frame_save</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>Frame</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>main</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>VelFrame</value>
+    </param>
+  </block>
+  <block>
     <key>variable_qtgui_entry</key>
     <param>
       <key>comment</key>
@@ -1166,7 +1148,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>2,2,1,1</value>
+      <value>0,1,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1291,7 +1273,7 @@
     </param>
     <param>
       <key>label</key>
-      <value>Obs</value>
+      <value>Who</value>
     </param>
     <param>
       <key>type</key>
@@ -1361,11 +1343,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(384, 628)</value>
+      <value>(392, 668)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>1,0,1,2</value>
+      <value>1,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1397,7 +1379,7 @@
     </param>
     <param>
       <key>label</key>
-      <value>Obstype</value>
+      <value>Obs</value>
     </param>
     <param>
       <key>labels</key>
@@ -1464,7 +1446,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(800, 396)</value>
+      <value>(800, 404)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1511,7 +1493,7 @@
     </param>
     <param>
       <key>gui_hint</key>
-      <value>2,0,1,2</value>
+      <value>2,0,1,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1638,6 +1620,53 @@
     </param>
   </block>
   <block>
+    <key>variable_config</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>config_file</key>
+      <value>ConfigFile</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1136, 572)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>xaxis_save_0</value>
+    </param>
+    <param>
+      <key>option</key>
+      <value>Xaxis</value>
+    </param>
+    <param>
+      <key>section</key>
+      <value>main</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>writeback</key>
+      <value>Xaxis</value>
+    </param>
+  </block>
+  <block>
     <key>variable</key>
     <param>
       <key>comment</key>
@@ -1715,7 +1744,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>[0.12, -7, 300]</value>
+      <value>[.1, -7, 300]</value>
     </param>
   </block>
   <block>
@@ -1761,7 +1790,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(144, 300)</value>
+      <value>(232, 332)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1816,7 +1845,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(544, 384)</value>
+      <value>(544, 408)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1828,11 +1857,11 @@
     </param>
     <param>
       <key>gain2</key>
-      <value>Gain2</value>
+      <value>12</value>
     </param>
     <param>
       <key>gain3</key>
-      <value>Gain3</value>
+      <value>12</value>
     </param>
     <param>
       <key>id</key>
@@ -1868,7 +1897,7 @@
     </param>
     <param>
       <key>nmedian</key>
-      <value>4**6</value>
+      <value>4**5</value>
     </param>
   </block>
   <block>
@@ -1895,7 +1924,7 @@
     </param>
     <param>
       <key>count</key>
-      <value>(4**6)</value>
+      <value>(4**5)</value>
     </param>
     <param>
       <key>elevation</key>
@@ -1911,7 +1940,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(96, 372)</value>
+      <value>(88, 404)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1963,7 +1992,7 @@
     </param>
   </block>
   <block>
-    <key>blocks_complex_to_mag</key>
+    <key>blocks_complex_to_mag_squared</key>
     <param>
       <key>alias</key>
       <value></value>
@@ -1982,7 +2011,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(792, 52)</value>
+      <value>(784, 52)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1990,7 +2019,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>blocks_complex_to_mag_0</value>
+      <value>blocks_complex_to_mag_squared_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -2162,7 +2191,7 @@
     </param>
     <param>
       <key>bb_gain0</key>
-      <value>float(Gain3)</value>
+      <value>12</value>
     </param>
     <param>
       <key>bw0</key>
@@ -2186,7 +2215,7 @@
     </param>
     <param>
       <key>if_gain0</key>
-      <value>float(Gain2)</value>
+      <value>12</value>
     </param>
     <param>
       <key>iq_balance_mode0</key>
@@ -3585,11 +3614,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(312, 401)</value>
+      <value>(312, 412)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value>3,0,8,8</value>
+      <value>5,0,7,7</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3789,7 +3818,7 @@
     </param>
     <param>
       <key>update_time</key>
-      <value>2</value>
+      <value>1</value>
     </param>
     <param>
       <key>vlen</key>
@@ -3821,7 +3850,7 @@
     </param>
     <param>
       <key>y_axis_label</key>
-      <value>Intensity</value>
+      <value>Power</value>
     </param>
     <param>
       <key>y_units</key>
@@ -3856,7 +3885,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ra_vmedian_0</value>
+      <value>ra_vmedian_1</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -3903,7 +3932,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ra_vmedian_0_0</value>
+      <value>ra_vmedian_2</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -3942,7 +3971,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(640, 196)</value>
+      <value>(376, 220)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3950,7 +3979,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ra_vmedian_0_0_0</value>
+      <value>ra_vmedian_3</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -3989,7 +4018,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(368, 220)</value>
+      <value>(544, 220)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3997,7 +4026,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ra_vmedian_0_1</value>
+      <value>ra_vmedian_4</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -4036,7 +4065,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(816, 196)</value>
+      <value>(704, 228)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -4044,54 +4073,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>ra_vmedian_0_1_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>fftsize</value>
-    </param>
-    <param>
-      <key>vdecimate</key>
-      <value>4</value>
-    </param>
-  </block>
-  <block>
-    <key>ra_vmedian</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(544, 284)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>ra_vmedian_0_1_0_0</value>
+      <value>ra_vmedian_5</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -4141,8 +4123,8 @@
     <sink_key>4</sink_key>
   </connection>
   <connection>
-    <source_block_id>blocks_complex_to_mag_0</source_block_id>
-    <sink_block_id>ra_vmedian_0</sink_block_id>
+    <source_block_id>blocks_complex_to_mag_squared_0</source_block_id>
+    <sink_block_id>ra_vmedian_1</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4154,7 +4136,7 @@
   </connection>
   <connection>
     <source_block_id>fft_vxx_0</source_block_id>
-    <sink_block_id>blocks_complex_to_mag_0</sink_block_id>
+    <sink_block_id>blocks_complex_to_mag_squared_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -4165,44 +4147,38 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0</source_block_id>
-    <sink_block_id>ra_vmedian_0_0</sink_block_id>
+    <source_block_id>ra_vmedian_1</source_block_id>
+    <sink_block_id>ra_vmedian_2</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_0</source_block_id>
-    <sink_block_id>ra_vmedian_0_1</sink_block_id>
+    <source_block_id>ra_vmedian_2</source_block_id>
+    <sink_block_id>ra_vmedian_3</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_0_0</source_block_id>
-    <sink_block_id>ra_vmedian_0_1_0</sink_block_id>
+    <source_block_id>ra_vmedian_3</source_block_id>
+    <sink_block_id>ra_vmedian_4</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_1</source_block_id>
-    <sink_block_id>ra_vmedian_0_1_0_0</sink_block_id>
+    <source_block_id>ra_vmedian_4</source_block_id>
+    <sink_block_id>ra_vmedian_5</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_1_0</source_block_id>
+    <source_block_id>ra_vmedian_5</source_block_id>
     <sink_block_id>Ra_Ascii_Sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_1_0</source_block_id>
+    <source_block_id>ra_vmedian_5</source_block_id>
     <sink_block_id>Ra_Integrate_1</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>ra_vmedian_0_1_0_0</source_block_id>
-    <sink_block_id>ra_vmedian_0_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

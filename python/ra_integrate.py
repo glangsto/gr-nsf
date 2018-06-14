@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 #
 # HISTORY
+# 18JUN13 GIL remove subtraction of signals
 # 18MAY20 GIL code cleanup
 # 18APR20 GIL first functioning version
 # 18APR11 GIL first functioning version
@@ -29,15 +30,6 @@ import sys
 import datetime
 import numpy as np
 from gnuradio import gr
-
-#try:
-#    import statistics
-#except ImportError:
-#    print 'Statistics Python Code needed!'
-#    print 'In Linux type:'
-#    print '       sudo pip install statistics'
-#    print ''
-#    exit()
 
 import radioastronomy
 
@@ -453,11 +445,11 @@ class ra_integrate(gr.sync_block):
             # get the length of one input
             spec = inn[i]
 #           attempt to remove DC bias, but seems to be more due to insufficient gain
-            beginvalue = np.min(spec[li2:li20])
-            endvalue = np.min(spec[li1920:linm2])
-            minvalue = (beginvalue+endvalue)*.5
+#            beginvalue = np.min(spec[li2:li20])
+#            endvalue = np.min(spec[li1920:linm2])
+#            minvalue = (beginvalue+endvalue)*.5
             # now subtract the DC bias
-            spec = spec - np.full(self.vlen, minvalue)
+#            spec = spec - np.full(self.vlen, minvalue)
             # deal with average state
             if self.inttype == radioastronomy.INTWAIT:
                 self.ave.ydataB = spec
