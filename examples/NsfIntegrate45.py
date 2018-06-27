@@ -5,7 +5,7 @@
 # Title: NsfIntegrate: Average+Record Astronomical Obs.
 # Author: Glen Langston
 # Description: Analog Devices Pluto 
-# Generated: Tue Jun 26 21:14:13 2018
+# Generated: Tue Jun 26 23:13:07 2018
 ##################################################
 
 if __name__ == '__main__':
@@ -66,7 +66,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.ConfigFile = ConfigFile = "Watch40.conf"
+        self.ConfigFile = ConfigFile = "Watch45.conf"
         self._Frequencys_config = ConfigParser.ConfigParser()
         self._Frequencys_config.read(ConfigFile)
         try: Frequencys = self._Frequencys_config.getfloat("main", "Frequency")
@@ -372,6 +372,12 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._Azimuth_save_config.add_section("main")
         self._Azimuth_save_config.set("main", "azimuth", str(self.Azimuth))
         self._Azimuth_save_config.write(open(self.ConfigFile, 'w'))
+        self._Bandwidths_config = ConfigParser.ConfigParser()
+        self._Bandwidths_config.read(self.ConfigFile)
+        if not self._Bandwidths_config.has_section("main"):
+        	self._Bandwidths_config.add_section("main")
+        self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
+        self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
         self._Elevation_save_config = ConfigParser.ConfigParser()
         self._Elevation_save_config.read(self.ConfigFile)
         if not self._Elevation_save_config.has_section("main"):
@@ -438,12 +444,6 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._xaxis_save_0_config.add_section("main")
         self._xaxis_save_0_config.set("main", "Xaxis", str(self.Xaxis))
         self._xaxis_save_0_config.write(open(self.ConfigFile, 'w'))
-        self._Bandwidths_config = ConfigParser.ConfigParser()
-        self._Bandwidths_config.read(self.ConfigFile)
-        if not self._Bandwidths_config.has_section("main"):
-        	self._Bandwidths_config.add_section("main")
-        self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
-        self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
 
     def get_Frequencys(self):
         return self.Frequencys
@@ -489,17 +489,17 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
     def set_Bandwidth(self, Bandwidth):
         self.Bandwidth = Bandwidth
         Qt.QMetaObject.invokeMethod(self._Bandwidth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Bandwidth)))
-        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
-        self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
-        self.Ra_Ascii_Sink_0.set_bandwidth( self.Bandwidth)
-        self.Ra_Integrate_1.set_bandwidth( self.Bandwidth)
-        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(self.Bandwidth), True, True, True, "manual", self.Gain1, "", True)
         self._Bandwidths_config = ConfigParser.ConfigParser()
         self._Bandwidths_config.read(self.ConfigFile)
         if not self._Bandwidths_config.has_section("main"):
         	self._Bandwidths_config.add_section("main")
         self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
         self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
+        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
+        self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
+        self.Ra_Ascii_Sink_0.set_bandwidth( self.Bandwidth)
+        self.Ra_Integrate_1.set_bandwidth( self.Bandwidth)
+        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(self.Bandwidth), True, True, True, "manual", self.Gain1, "", True)
 
     def get_xaxis_save(self):
         return self.xaxis_save
