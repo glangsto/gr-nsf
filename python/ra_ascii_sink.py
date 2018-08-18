@@ -14,6 +14,8 @@
 # GNU General Public License for more details.
 #
 # HISTORY
+# 18AUG18 GIL return time until average is complete
+# 18AUG17 GIL allow note file to have any extension on input
 # 18MAY20 GIL code cleanup
 # 18APR29 GIL fix change in nmedian and expected duration
 # 18APR20 GIL add gain1, gain2 and gain3
@@ -49,7 +51,8 @@ class ra_ascii_sink(gr.sync_block):
         gr.sync_block.__init__(self,
                                name="ra_ascii_sink",              
                                in_sig=[(np.float32, int(vlen))], # input is 1 spectrum
-                               out_sig=None)
+                               out_sig=[np.float32],             # output is time remaining
+        )
         vlen = int(vlen)
         self.vlen = vlen
         self.nave = nave
@@ -57,6 +60,13 @@ class ra_ascii_sink(gr.sync_block):
         self.record = radioastronomy.INTWAIT
         self.sum = np.zeros(vlen)
         self.noteName = str(noteName)
+        # split out extension name
+        noteParts = self.noteName.split('.')
+        #always use .not extension for notes files
+        self.noteName = noteParts[0]+'.not'
+        if len(noteParts) > 2:
+            print '!!! Warning, unexpected Notes File name! '
+            print '!!! Using file: ',self.noteName
         self.obs = radioastronomy.Spectrum()
         self.obs.read_spec_ast(self.noteName)    # read the parameters 
         self.obs.observer = observers
@@ -69,9 +79,27 @@ class ra_ascii_sink(gr.sync_block):
         self.startutc = now
         self.stoputc = now
         self.obs.utc = now
+        self.average_done = 0.0  # no data averaged yet
         self.setupdir = "./"
         self.noteName = noteName
-        print 'Setup File       : ', self.noteName
+        # split out extension name
+        noteParts = self.noteName.split('.')
+        #always use .not extension for notes files
+        self.noteName = noteParts[0]+'.not'
+        if len(noteParts) > 2:
+            print '!!! Warning, unexpected Notes File name! '
+            print '!!! Using file: ', self.noteName
+        else:
+            if os.path.isfile( self.noteName):
+                print 'Setup File       : ', self.noteName
+            else:
+                if os.path.isfile( "Watch.not"):
+                    try:
+                        import shutil
+                        shutil.copyfile( "Watch.not", self.noteName)
+                        print "Created %s from file: Watch.not" % (self.noteName)
+                    except:
+                        print "! Create the Note file %s, and try again !" % (self.noteName)
         if not os.path.exists(self.obs.datadir):
             os.makedirs(self.obs.datadir)
         nd = len(self.obs.datadir)
@@ -86,8 +114,8 @@ class ra_ascii_sink(gr.sync_block):
         self.set_bandwidth(bandwidth, dosave)
         self.set_azimuth(azimuth, dosave)
         self.set_elevation(elevation, dosave)
-        self.set_nave(nave, dosave)
         self.set_nmedian(nmedian, dosave)
+        self.set_nave(nave, dosave)
         self.set_gain1(gain1, dosave)
         self.set_gain2(gain2, dosave)
         self.set_gain3(gain3, dosave)
@@ -120,6 +148,8 @@ class ra_ascii_sink(gr.sync_block):
         n0 = self.obs.centerFreqHz - (self.obs.bandwidthHz/2.)
         nu = n0
         print "Setting Bandwidth: %10.0f Hz" % (self.obs.bandwidthHz)
+        self.dt = self.obs.nmedian * self.vlen / self.obs.bandwidthHz
+        self.average_sec = self.dt * self.nave
         for iii in range(self.vlen):
             self.obs.xdata[iii] = nu
             nu = nu + deltaNu
@@ -149,8 +179,9 @@ class ra_ascii_sink(gr.sync_block):
         Set the number of spectra averaged before input to work block
         """
         self.obs.nmedian = int(nmedian)
-        t = self.obs.nmedian * self.nave * self.vlen / self.obs.bandwidthHz
-        print 'Median N Spectra : %d  (Integration time: %8.3f)' % (self.obs.nmedian, t)
+        self.dt = self.obs.nmedian * self.vlen / self.obs.bandwidthHz
+        self.average_sec = self.dt * self.nave
+        print 'Median N Spectra : %d  (Integration time: %8.3f)' % (self.obs.nmedian, self.average_sec)
         if dosave:
             self.save_setup()
 
@@ -185,8 +216,9 @@ class ra_ascii_sink(gr.sync_block):
         self.nave = int(nave)
         self.obs.nave = self.nave
         print 'Average N Spectra: %d' % (self.nave)
-        t = self.obs.nmedian * self.nave * self.vlen / self.obs.bandwidthHz
-        print 'Average time     : %8.3f s' % (t)
+        self.dt = self.obs.nmedian * self.vlen / self.obs.bandwidthHz
+        self.average_sec = self.dt * self.nave
+        print 'Average time     : %8.3f s' % (self.average_sec)
         if dosave:
             self.save_setup()
 
@@ -279,6 +311,18 @@ class ra_ascii_sink(gr.sync_block):
         """
         return self.obstype
 
+    def get_average_sec(self):
+        """
+        return the total predicted averaging time (seconds)
+        """
+        return self.average_sec
+
+    def get_average_left(self):
+        """
+        return the total time remaining is expected minus total (seconds)
+        """
+        return (self.average_sec - self.average_done)
+
     def work(self, input_items, output_items):
         """
         Work averages all input vectors and outputs one vector for each N inputs
@@ -290,6 +334,7 @@ class ra_ascii_sink(gr.sync_block):
         spec = inn[0]          # first input vector
         li = len(spec)          # length of first input vector
         ncp = min(li, self.vlen)  # don't copy more required (not used)
+        t = 0
 
         if li != self.vlen:
             print 'spectrum length changed! %d => %d' % (self.vlen, li)
@@ -302,18 +347,23 @@ class ra_ascii_sink(gr.sync_block):
             return 1
 
         noutports = len(output_items)
-        if noutports != 0:
+        if noutports != 1:
             print '!!!!!!! Unexpected number of output ports: ', noutports
+        out = output_items[0]  # all vectors in PORT 0
 
+        iout = 0 # count the number of output vectors
         for i in range(nv):
             # get the length of one input
             spec = inn[i]
             # if just starting a sum
             if self.avecount == 0:
                 self.sum = spec
+                self.average_done = self.dt
             else:
                 # else add to sum
+                self.average_done = self.average_done + self.dt
                 self.sum = self.sum + spec
+#            print 'Done: ', self.average_done
             self.avecount = self.avecount + 1
             # if still averaging, continue
             if self.avecount < self.nave:
@@ -372,9 +422,14 @@ class ra_ascii_sink(gr.sync_block):
             # if here data written, restart sum
             self.avecount = 0
             self.startutc = now
-              
+
+        out[:] = self.average_sec - self.average_done
+        iout = iout+1
+        
         # end for all input vectors
-        return 1
+        if (nv != iout):
+            print 'Accumulation error:  ', nv, iout
+        return iout
     # end ascii_sink()
 
 

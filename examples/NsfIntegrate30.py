@@ -5,7 +5,7 @@
 # Title: NsfIntegrate: Average+Record Astronomical Obs.
 # Author: Glen Langston
 # Description: Analog Devices Pluto 
-# Generated: Sat Aug 11 16:46:59 2018
+# Generated: Sat Aug 18 10:31:08 2018
 ##################################################
 
 if __name__ == '__main__':
@@ -38,7 +38,7 @@ import sip
 import sys
 
 
-class NsfIntegrate45(gr.top_block, Qt.QWidget):
+class NsfIntegrate30(gr.top_block, Qt.QWidget):
 
     def __init__(self):
         gr.top_block.__init__(self, "NsfIntegrate: Average+Record Astronomical Obs.")
@@ -60,7 +60,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate45")
+        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate30")
         self.restoreGeometry(self.settings.value("geometry").toByteArray())
 
         ##################################################
@@ -223,7 +223,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	lambda: self.set_Telescope(str(str(self._Telescope_line_edit.text().toAscii()))))
         self.top_grid_layout.addWidget(self._Telescope_tool_bar, 1,0,1,2)
         self._Record_options = (0, 1, 2, )
-        self._Record_labels = ("Wait", "Average", "Save", )
+        self._Record_labels = ("! Wait !", "AVERAGE", "Save", )
         self._Record_tool_bar = Qt.QToolBar(self)
         self._Record_tool_bar.addWidget(Qt.QLabel("Rec"+": "))
         self._Record_combo_box = Qt.QComboBox()
@@ -317,6 +317,37 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         
         self._qtgui_vector_sink_f_0_0_win = sip.wrapinstance(self.qtgui_vector_sink_f_0_0.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_vector_sink_f_0_0_win, 2,1,8,6)
+        self.qtgui_number_sink_0 = qtgui.number_sink(
+            gr.sizeof_float,
+            0,
+            qtgui.NUM_GRAPH_NONE,
+            1
+        )
+        self.qtgui_number_sink_0.set_update_time(1)
+        self.qtgui_number_sink_0.set_title("")
+        
+        labels = ["T Remains:", "", "", "", "",
+                  "", "", "", "", ""]
+        units = ["(s)", "", "", "", "",
+                 "", "", "", "", ""]
+        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
+                  ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
+        factor = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        for i in xrange(1):
+            self.qtgui_number_sink_0.set_min(i, 0)
+            self.qtgui_number_sink_0.set_max(i, nAve * fftsize * 1024. / Bandwidth)
+            self.qtgui_number_sink_0.set_color(i, colors[i][0], colors[i][1])
+            if len(labels[i]) == 0:
+                self.qtgui_number_sink_0.set_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_number_sink_0.set_label(i, labels[i])
+            self.qtgui_number_sink_0.set_unit(i, units[i])
+            self.qtgui_number_sink_0.set_factor(i, factor[i])
+        
+        self.qtgui_number_sink_0.enable_autoscale(False)
+        self._qtgui_number_sink_0_win = sip.wrapinstance(self.qtgui_number_sink_0.pyqwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._qtgui_number_sink_0_win, 11,6,1,2)
         self.qtgui_histogram_sink_x_0 = qtgui.histogram_sink_f(
         	1024,
         	100,
@@ -360,7 +391,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         self._qtgui_histogram_sink_x_0_win = sip.wrapinstance(self.qtgui_histogram_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_histogram_sink_x_0_win, 4,0,3,1)
           
-        self.pluto_source_0 = iio.pluto_source("", int(Frequency), int(Bandwidth), int(Bandwidth), 0x80000, True, False, True, "manual", Gain1, "", True)
+        self.pluto_source_0 = iio.pluto_source("", int(Frequency), int(Bandwidth), int(2.*Bandwidth), 0x10000, True, False, True, "manual", Gain1, "", True)
         self.fft_vxx_0 = fft.fft_vcc(fftsize, True, (window.hamming(fftsize)), True, 1)
         self.blocks_stream_to_vector_0_0 = blocks.stream_to_vector(gr.sizeof_gr_complex*1, fftsize)
         self.blocks_complex_to_mag_squared_0 = blocks.complex_to_mag_squared(fftsize)
@@ -377,13 +408,14 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         self._VelFrame_combo_box.currentIndexChanged.connect(
         	lambda i: self.set_VelFrame(self._VelFrame_options[i]))
         self.top_grid_layout.addWidget(self._VelFrame_tool_bar, 11,0,1,1)
-        self.Ra_Integrate_1 = ra_integrate.ra_integrate("Watch.not", observer, fftsize, Frequency, Bandwidth, Azimuth, Elevation, Record, obstype, (4**5), units, 295., 10.)
-        self.Ra_Ascii_Sink_0 = ra_ascii_sink.ra_ascii_sink("Watch.not", observer, fftsize, Frequency, Bandwidth, Azimuth, Elevation, Record, 
+        self.Ra_Integrate_1 = ra_integrate.ra_integrate(str(ConfigFile), observer, fftsize, Frequency, Bandwidth, Azimuth, Elevation, Record, obstype, (4**5), units, 295., 10.)
+        self.Ra_Ascii_Sink_0 = ra_ascii_sink.ra_ascii_sink(ConfigFile, observer, fftsize, Frequency, Bandwidth, Azimuth, Elevation, Record, 
             obstype, 4**5, nAve, Telescope, Device, Gain1, 12, 12)
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.Ra_Ascii_Sink_0, 0), (self.qtgui_number_sink_0, 0))    
         self.connect((self.Ra_Integrate_1, 1), (self.qtgui_vector_sink_f_0_0, 1))    
         self.connect((self.Ra_Integrate_1, 3), (self.qtgui_vector_sink_f_0_0, 3))    
         self.connect((self.Ra_Integrate_1, 2), (self.qtgui_vector_sink_f_0_0, 2))    
@@ -404,7 +436,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         self.connect((self.ra_vmedian_5, 0), (self.Ra_Integrate_1, 0))    
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate45")
+        self.settings = Qt.QSettings("GNU Radio", "NsfIntegrate30")
         self.settings.setValue("geometry", self.saveGeometry())
         event.accept()
 
@@ -414,84 +446,86 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_ConfigFile(self, ConfigFile):
         self.ConfigFile = ConfigFile
-        self._Azimuth_save_config = ConfigParser.ConfigParser()
-        self._Azimuth_save_config.read(self.ConfigFile)
-        if not self._Azimuth_save_config.has_section("main"):
-        	self._Azimuth_save_config.add_section("main")
-        self._Azimuth_save_config.set("main", "azimuth", str(self.Azimuth))
-        self._Azimuth_save_config.write(open(self.ConfigFile, 'w'))
         self._Bandwidths_config = ConfigParser.ConfigParser()
         self._Bandwidths_config.read(self.ConfigFile)
         if not self._Bandwidths_config.has_section("main"):
         	self._Bandwidths_config.add_section("main")
         self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
         self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
-        self._Elevation_save_config = ConfigParser.ConfigParser()
-        self._Elevation_save_config.read(self.ConfigFile)
-        if not self._Elevation_save_config.has_section("main"):
-        	self._Elevation_save_config.add_section("main")
-        self._Elevation_save_config.set("main", "elevation", str(self.Elevation))
-        self._Elevation_save_config.write(open(self.ConfigFile, 'w'))
         self._Frequencys_config = ConfigParser.ConfigParser()
         self._Frequencys_config.read(self.ConfigFile)
         if not self._Frequencys_config.has_section("main"):
         	self._Frequencys_config.add_section("main")
         self._Frequencys_config.set("main", "Frequency", str(self.Frequency))
         self._Frequencys_config.write(open(self.ConfigFile, 'w'))
-        self._Gain1s_config = ConfigParser.ConfigParser()
-        self._Gain1s_config.read(self.ConfigFile)
-        if not self._Gain1s_config.has_section("main"):
-        	self._Gain1s_config.add_section("main")
-        self._Gain1s_config.set("main", "gain1", str(self.Gain1))
-        self._Gain1s_config.write(open(self.ConfigFile, 'w'))
-        self._device_save_config = ConfigParser.ConfigParser()
-        self._device_save_config.read(self.ConfigFile)
-        if not self._device_save_config.has_section("main"):
-        	self._device_save_config.add_section("main")
-        self._device_save_config.set("main", "device", str(self.Device))
-        self._device_save_config.write(open(self.ConfigFile, 'w'))
-        self._fftsize_save_config = ConfigParser.ConfigParser()
-        self._fftsize_save_config.read(self.ConfigFile)
-        if not self._fftsize_save_config.has_section("main"):
-        	self._fftsize_save_config.add_section("main")
-        self._fftsize_save_config.set("main", "fftsize", str(self.fftsize))
-        self._fftsize_save_config.write(open(self.ConfigFile, 'w'))
-        self._frame_save_config = ConfigParser.ConfigParser()
-        self._frame_save_config.read(self.ConfigFile)
-        if not self._frame_save_config.has_section("main"):
-        	self._frame_save_config.add_section("main")
-        self._frame_save_config.set("main", "Frame", str(self.VelFrame))
-        self._frame_save_config.write(open(self.ConfigFile, 'w'))
-        self._nAves_config = ConfigParser.ConfigParser()
-        self._nAves_config.read(self.ConfigFile)
-        if not self._nAves_config.has_section("main"):
-        	self._nAves_config.add_section("main")
-        self._nAves_config.set("main", "nave", str(self.nAve))
-        self._nAves_config.write(open(self.ConfigFile, 'w'))
-        self._observers_save_config = ConfigParser.ConfigParser()
-        self._observers_save_config.read(self.ConfigFile)
-        if not self._observers_save_config.has_section("main"):
-        	self._observers_save_config.add_section("main")
-        self._observers_save_config.set("main", "observers", str(self.observer))
-        self._observers_save_config.write(open(self.ConfigFile, 'w'))
-        self._telescope_save_config = ConfigParser.ConfigParser()
-        self._telescope_save_config.read(self.ConfigFile)
-        if not self._telescope_save_config.has_section("main"):
-        	self._telescope_save_config.add_section("main")
-        self._telescope_save_config.set("main", "telescope", str(self.Telescope))
-        self._telescope_save_config.write(open(self.ConfigFile, 'w'))
         self._xaxis_save_config = ConfigParser.ConfigParser()
         self._xaxis_save_config.read(self.ConfigFile)
         if not self._xaxis_save_config.has_section("main"):
         	self._xaxis_save_config.add_section("main")
         self._xaxis_save_config.set("main", "Xaxis", str(self.Xaxis))
         self._xaxis_save_config.write(open(self.ConfigFile, 'w'))
+        self._device_save_config = ConfigParser.ConfigParser()
+        self._device_save_config.read(self.ConfigFile)
+        if not self._device_save_config.has_section("main"):
+        	self._device_save_config.add_section("main")
+        self._device_save_config.set("main", "device", str(self.Device))
+        self._device_save_config.write(open(self.ConfigFile, 'w'))
+        self.Ra_Ascii_Sink_0.set_setup( self.ConfigFile)
+        self.Ra_Integrate_1.set_setup( str(self.ConfigFile))
+        self._telescope_save_config = ConfigParser.ConfigParser()
+        self._telescope_save_config.read(self.ConfigFile)
+        if not self._telescope_save_config.has_section("main"):
+        	self._telescope_save_config.add_section("main")
+        self._telescope_save_config.set("main", "telescope", str(self.Telescope))
+        self._telescope_save_config.write(open(self.ConfigFile, 'w'))
+        self._Elevation_save_config = ConfigParser.ConfigParser()
+        self._Elevation_save_config.read(self.ConfigFile)
+        if not self._Elevation_save_config.has_section("main"):
+        	self._Elevation_save_config.add_section("main")
+        self._Elevation_save_config.set("main", "elevation", str(self.Elevation))
+        self._Elevation_save_config.write(open(self.ConfigFile, 'w'))
+        self._observers_save_config = ConfigParser.ConfigParser()
+        self._observers_save_config.read(self.ConfigFile)
+        if not self._observers_save_config.has_section("main"):
+        	self._observers_save_config.add_section("main")
+        self._observers_save_config.set("main", "observers", str(self.observer))
+        self._observers_save_config.write(open(self.ConfigFile, 'w'))
+        self._frame_save_config = ConfigParser.ConfigParser()
+        self._frame_save_config.read(self.ConfigFile)
+        if not self._frame_save_config.has_section("main"):
+        	self._frame_save_config.add_section("main")
+        self._frame_save_config.set("main", "Frame", str(self.VelFrame))
+        self._frame_save_config.write(open(self.ConfigFile, 'w'))
+        self._Gain1s_config = ConfigParser.ConfigParser()
+        self._Gain1s_config.read(self.ConfigFile)
+        if not self._Gain1s_config.has_section("main"):
+        	self._Gain1s_config.add_section("main")
+        self._Gain1s_config.set("main", "gain1", str(self.Gain1))
+        self._Gain1s_config.write(open(self.ConfigFile, 'w'))
+        self._Azimuth_save_config = ConfigParser.ConfigParser()
+        self._Azimuth_save_config.read(self.ConfigFile)
+        if not self._Azimuth_save_config.has_section("main"):
+        	self._Azimuth_save_config.add_section("main")
+        self._Azimuth_save_config.set("main", "azimuth", str(self.Azimuth))
+        self._Azimuth_save_config.write(open(self.ConfigFile, 'w'))
+        self._nAves_config = ConfigParser.ConfigParser()
+        self._nAves_config.read(self.ConfigFile)
+        if not self._nAves_config.has_section("main"):
+        	self._nAves_config.add_section("main")
+        self._nAves_config.set("main", "nave", str(self.nAve))
+        self._nAves_config.write(open(self.ConfigFile, 'w'))
         self._xaxis_save_0_config = ConfigParser.ConfigParser()
         self._xaxis_save_0_config.read(self.ConfigFile)
         if not self._xaxis_save_0_config.has_section("main"):
         	self._xaxis_save_0_config.add_section("main")
         self._xaxis_save_0_config.set("main", "Xaxis", str(self.Xaxis))
         self._xaxis_save_0_config.write(open(self.ConfigFile, 'w'))
+        self._fftsize_save_config = ConfigParser.ConfigParser()
+        self._fftsize_save_config.read(self.ConfigFile)
+        if not self._fftsize_save_config.has_section("main"):
+        	self._fftsize_save_config.add_section("main")
+        self._fftsize_save_config.set("main", "fftsize", str(self.fftsize))
+        self._fftsize_save_config.write(open(self.ConfigFile, 'w'))
 
     def get_Frequencys(self):
         return self.Frequencys
@@ -519,35 +553,35 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_Frequency(self, Frequency):
         self.Frequency = Frequency
-        Qt.QMetaObject.invokeMethod(self._Frequency_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Frequency)))
         self._Frequencys_config = ConfigParser.ConfigParser()
         self._Frequencys_config.read(self.ConfigFile)
         if not self._Frequencys_config.has_section("main"):
         	self._Frequencys_config.add_section("main")
         self._Frequencys_config.set("main", "Frequency", str(self.Frequency))
         self._Frequencys_config.write(open(self.ConfigFile, 'w'))
-        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
+        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(2.*self.Bandwidth), True, False, True, "manual", self.Gain1, "", True)
         self.Ra_Ascii_Sink_0.set_frequency( self.Frequency)
+        Qt.QMetaObject.invokeMethod(self._Frequency_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Frequency)))
         self.Ra_Integrate_1.set_frequency( self.Frequency)
-        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(self.Bandwidth), True, False, True, "manual", self.Gain1, "", True)
+        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
 
     def get_Bandwidth(self):
         return self.Bandwidth
 
     def set_Bandwidth(self, Bandwidth):
         self.Bandwidth = Bandwidth
-        Qt.QMetaObject.invokeMethod(self._Bandwidth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Bandwidth)))
         self._Bandwidths_config = ConfigParser.ConfigParser()
         self._Bandwidths_config.read(self.ConfigFile)
         if not self._Bandwidths_config.has_section("main"):
         	self._Bandwidths_config.add_section("main")
         self._Bandwidths_config.set("main", "Bandwidth", str(self.Bandwidth))
         self._Bandwidths_config.write(open(self.ConfigFile, 'w'))
-        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
         self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
+        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(2.*self.Bandwidth), True, False, True, "manual", self.Gain1, "", True)
         self.Ra_Ascii_Sink_0.set_bandwidth( self.Bandwidth)
+        Qt.QMetaObject.invokeMethod(self._Bandwidth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Bandwidth)))
         self.Ra_Integrate_1.set_bandwidth( self.Bandwidth)
-        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(self.Bandwidth), True, False, True, "manual", self.Gain1, "", True)
+        self.set_numin((self.Frequency - (self.Bandwidth/2.)))
 
     def get_xaxis_save(self):
         return self.xaxis_save
@@ -596,6 +630,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_fftsize(self, fftsize):
         self.fftsize = fftsize
+        self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
         Qt.QMetaObject.invokeMethod(self._fftsize_line_edit, "setText", Qt.Q_ARG("QString", str(self.fftsize)))
         self._fftsize_save_config = ConfigParser.ConfigParser()
         self._fftsize_save_config.read(self.ConfigFile)
@@ -603,7 +638,6 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._fftsize_save_config.add_section("main")
         self._fftsize_save_config.set("main", "fftsize", str(self.fftsize))
         self._fftsize_save_config.write(open(self.ConfigFile, 'w'))
-        self.set_xsteps([self.Bandwidth*1.E-6/self.fftsize, -self.Bandwidth*3.E5/(self.H1*self.fftsize), 1])
 
     def get_device_save(self):
         return self.device_save
@@ -698,8 +732,8 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_obstype(self, obstype):
         self.obstype = obstype
-        self._obstype_callback(self.obstype)
         self.Ra_Ascii_Sink_0.set_obstype( self.obstype)
+        self._obstype_callback(self.obstype)
         self.Ra_Integrate_1.set_obstype( self.obstype)
 
     def get_observer(self):
@@ -707,21 +741,22 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_observer(self, observer):
         self.observer = observer
+        self.Ra_Ascii_Sink_0.set_observers( self.observer)
         Qt.QMetaObject.invokeMethod(self._observer_line_edit, "setText", Qt.Q_ARG("QString", str(self.observer)))
+        self.Ra_Integrate_1.set_observers( self.observer)
         self._observers_save_config = ConfigParser.ConfigParser()
         self._observers_save_config.read(self.ConfigFile)
         if not self._observers_save_config.has_section("main"):
         	self._observers_save_config.add_section("main")
         self._observers_save_config.set("main", "observers", str(self.observer))
         self._observers_save_config.write(open(self.ConfigFile, 'w'))
-        self.Ra_Ascii_Sink_0.set_observers( self.observer)
-        self.Ra_Integrate_1.set_observers( self.observer)
 
     def get_nAve(self):
         return self.nAve
 
     def set_nAve(self, nAve):
         self.nAve = nAve
+        self.Ra_Ascii_Sink_0.set_nave( self.nAve)
         Qt.QMetaObject.invokeMethod(self._nAve_line_edit, "setText", Qt.Q_ARG("QString", str(self.nAve)))
         self._nAves_config = ConfigParser.ConfigParser()
         self._nAves_config.read(self.ConfigFile)
@@ -729,27 +764,26 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._nAves_config.add_section("main")
         self._nAves_config.set("main", "nave", str(self.nAve))
         self._nAves_config.write(open(self.ConfigFile, 'w'))
-        self.Ra_Ascii_Sink_0.set_nave( self.nAve)
 
     def get_Xaxis(self):
         return self.Xaxis
 
     def set_Xaxis(self, Xaxis):
         self.Xaxis = Xaxis
-        self._Xaxis_callback(self.Xaxis)
         self._xaxis_save_config = ConfigParser.ConfigParser()
         self._xaxis_save_config.read(self.ConfigFile)
         if not self._xaxis_save_config.has_section("main"):
         	self._xaxis_save_config.add_section("main")
         self._xaxis_save_config.set("main", "Xaxis", str(self.Xaxis))
         self._xaxis_save_config.write(open(self.ConfigFile, 'w'))
+        self.qtgui_vector_sink_f_0_0.set_x_axis(self.xmins[self.Xaxis], self.xsteps[self.Xaxis])
+        self._Xaxis_callback(self.Xaxis)
         self._xaxis_save_0_config = ConfigParser.ConfigParser()
         self._xaxis_save_0_config.read(self.ConfigFile)
         if not self._xaxis_save_0_config.has_section("main"):
         	self._xaxis_save_0_config.add_section("main")
         self._xaxis_save_0_config.set("main", "Xaxis", str(self.Xaxis))
         self._xaxis_save_0_config.write(open(self.ConfigFile, 'w'))
-        self.qtgui_vector_sink_f_0_0.set_x_axis(self.xmins[self.Xaxis], self.xsteps[self.Xaxis])
 
     def get_VelFrame(self):
         return self.VelFrame
@@ -769,6 +803,7 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_Telescope(self, Telescope):
         self.Telescope = Telescope
+        self.Ra_Ascii_Sink_0.set_site( self.Telescope)
         Qt.QMetaObject.invokeMethod(self._Telescope_line_edit, "setText", Qt.Q_ARG("QString", str(self.Telescope)))
         self._telescope_save_config = ConfigParser.ConfigParser()
         self._telescope_save_config.read(self.ConfigFile)
@@ -776,15 +811,14 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._telescope_save_config.add_section("main")
         self._telescope_save_config.set("main", "telescope", str(self.Telescope))
         self._telescope_save_config.write(open(self.ConfigFile, 'w'))
-        self.Ra_Ascii_Sink_0.set_site( self.Telescope)
 
     def get_Record(self):
         return self.Record
 
     def set_Record(self, Record):
         self.Record = Record
-        self._Record_callback(self.Record)
         self.Ra_Ascii_Sink_0.set_record( self.Record)
+        self._Record_callback(self.Record)
         self.Ra_Integrate_1.set_inttype( self.Record)
 
     def get_Gain1(self):
@@ -792,6 +826,8 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
 
     def set_Gain1(self, Gain1):
         self.Gain1 = Gain1
+        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(2.*self.Bandwidth), True, False, True, "manual", self.Gain1, "", True)
+        self.Ra_Ascii_Sink_0.set_gain1( self.Gain1)
         Qt.QMetaObject.invokeMethod(self._Gain1_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Gain1)))
         self._Gain1s_config = ConfigParser.ConfigParser()
         self._Gain1s_config.read(self.ConfigFile)
@@ -799,14 +835,14 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._Gain1s_config.add_section("main")
         self._Gain1s_config.set("main", "gain1", str(self.Gain1))
         self._Gain1s_config.write(open(self.ConfigFile, 'w'))
-        self.Ra_Ascii_Sink_0.set_gain1( self.Gain1)
-        self.pluto_source_0.set_params(int(self.Frequency), int(self.Bandwidth), int(self.Bandwidth), True, False, True, "manual", self.Gain1, "", True)
 
     def get_Elevation(self):
         return self.Elevation
 
     def set_Elevation(self, Elevation):
         self.Elevation = Elevation
+        self.Ra_Ascii_Sink_0.set_elevation( self.Elevation)
+        self.Ra_Integrate_1.set_elevation( self.Elevation)
         Qt.QMetaObject.invokeMethod(self._Elevation_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Elevation)))
         self._Elevation_save_config = ConfigParser.ConfigParser()
         self._Elevation_save_config.read(self.ConfigFile)
@@ -814,15 +850,12 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._Elevation_save_config.add_section("main")
         self._Elevation_save_config.set("main", "elevation", str(self.Elevation))
         self._Elevation_save_config.write(open(self.ConfigFile, 'w'))
-        self.Ra_Ascii_Sink_0.set_elevation( self.Elevation)
-        self.Ra_Integrate_1.set_elevation( self.Elevation)
 
     def get_Device(self):
         return self.Device
 
     def set_Device(self, Device):
         self.Device = Device
-        Qt.QMetaObject.invokeMethod(self._Device_line_edit, "setText", Qt.Q_ARG("QString", str(self.Device)))
         self._device_save_config = ConfigParser.ConfigParser()
         self._device_save_config.read(self.ConfigFile)
         if not self._device_save_config.has_section("main"):
@@ -830,12 +863,15 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         self._device_save_config.set("main", "device", str(self.Device))
         self._device_save_config.write(open(self.ConfigFile, 'w'))
         self.Ra_Ascii_Sink_0.set_device( self.Device)
+        Qt.QMetaObject.invokeMethod(self._Device_line_edit, "setText", Qt.Q_ARG("QString", str(self.Device)))
 
     def get_Azimuth(self):
         return self.Azimuth
 
     def set_Azimuth(self, Azimuth):
         self.Azimuth = Azimuth
+        self.Ra_Ascii_Sink_0.set_azimuth( self.Azimuth)
+        self.Ra_Integrate_1.set_azimuth( self.Azimuth)
         Qt.QMetaObject.invokeMethod(self._Azimuth_line_edit, "setText", Qt.Q_ARG("QString", eng_notation.num_to_str(self.Azimuth)))
         self._Azimuth_save_config = ConfigParser.ConfigParser()
         self._Azimuth_save_config.read(self.ConfigFile)
@@ -843,11 +879,9 @@ class NsfIntegrate45(gr.top_block, Qt.QWidget):
         	self._Azimuth_save_config.add_section("main")
         self._Azimuth_save_config.set("main", "azimuth", str(self.Azimuth))
         self._Azimuth_save_config.write(open(self.ConfigFile, 'w'))
-        self.Ra_Ascii_Sink_0.set_azimuth( self.Azimuth)
-        self.Ra_Integrate_1.set_azimuth( self.Azimuth)
 
 
-def main(top_block_cls=NsfIntegrate45, options=None):
+def main(top_block_cls=NsfIntegrate30, options=None):
 
     from distutils.version import StrictVersion
     if StrictVersion(Qt.qVersion()) >= StrictVersion("4.5.0"):

@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 #
 # HISTORY
+# 18AUG17 GIL allow note file to have any extension on input
 # 18JUN13 GIL remove subtraction of signals
 # 18MAY20 GIL code cleanup
 # 18APR20 GIL first functioning version
@@ -75,7 +76,7 @@ class ra_integrate(gr.sync_block):
     11) Cold load temperature
     This block is intended to reduce the downstream CPU load.
     """
-    def __init__(self, setupFile, observers, vlen, frequency, bandwidth, azimuth,
+    def __init__(self, noteName, observers, vlen, frequency, bandwidth, azimuth,
                  elevation, inttype, obstype, nmedian, units, thot, tcold):
         gr.sync_block.__init__(self,
                                name="integrate",
@@ -85,33 +86,49 @@ class ra_integrate(gr.sync_block):
                                         (np.float32, int(vlen)), (np.float32, int(vlen))])
         vlen = int(vlen)
         self.vlen = vlen
-        self.nave = 1L
-        self.setupFile = str(setupFile)
+        self.nintegrate = 1L
+        self.noteName = str(noteName)
+        noteParts = self.noteName.split('.')
+        #always use .not extension for notes files
+        self.noteName = noteParts[0]+'.not'
+        if len(noteParts) > 2:
+            print '!!! Warning, unexpected Notes File name! '
+            print '!!! Using file: ',self.noteName
+        if os.path.isfile( self.noteName):
+            print 'Setup File       : ', self.noteName
+        else:
+            if os.path.isfile( "Watch.not"):
+                try:
+                    import shutil
+                    shutil.copyfile( "Watch.not", self.noteName)
+                    print "Created %s from file: Watch.not" % (self.noteName)
+                except:
+                    print "! Create the Note file %s, and try again !" % (self.noteName)
         self.obstype = obstype
         self.inttype = inttype
         self.obs = radioastronomy.Spectrum()
+        self.obs.read_spec_ast(self.noteName)    # read the parameters
+        self.obs.observer = observers
         self.ave = radioastronomy.Spectrum()
+        self.ave.read_spec_ast(self.noteName)    # read the parameters
         self.frequency = frequency
         self.bandwidth = bandwidth
         self.record = radioastronomy.INTWAIT
         self.hot = radioastronomy.Spectrum()
         self.cold = radioastronomy.Spectrum()
         self.ref = radioastronomy.Spectrum()
-        self.obs.read_spec_ast(self.setupFile)    # read the parameters
-        self.obs.observer = observers
-        self.ave.read_spec_ast(self.setupFile)    # read the parameters
         if os.path.isfile(HOTFILE):
             self.hot.read_spec_ast(HOTFILE)
         else:
-            self.hot.read_spec_ast(self.setupFile)    # read the parameters
+            self.hot.read_spec_ast(self.noteName)    # read the parameters
         if os.path.isfile(COLDFILE):
             self.cold.read_spec_ast(COLDFILE)
         else:
-            self.cold.read_spec_ast(self.setupFile)    # read the parameters
+            self.cold.read_spec_ast(self.noteName)    # read the parameters
         if os.path.isfile(REFFILE):
             self.ref.read_spec_ast(REFFILE)
         else:
-            self.ref.read_spec_ast(self.setupFile)    # read the parameters
+            self.ref.read_spec_ast(self.noteName)    # read the parameters
         if self.obs.nChan != vlen:
             self.update_len(self.obs)
         if self.ave.nChan != vlen:
@@ -128,7 +145,10 @@ class ra_integrate(gr.sync_block):
         self.obs.utc = now
         self.printutc = now
         self.printinterval = 5.  # print averages every few seconds
-        print 'Setup File       : ', self.setupFile
+        print 'Setup File       : ', self.noteName
+        self.obs.read_spec_ast(self.noteName)    # read the parameters
+        self.obs.observer = observers
+        self.ave.read_spec_ast(self.noteName)    # read the parameters
         # prepare to start writing observations
         if not os.path.exists(self.obs.datadir):
             os.makedirs(self.obs.datadir)
@@ -246,14 +266,14 @@ class ra_integrate(gr.sync_block):
         """
         Return the name of the file used to setup the observations
         """
-        return self.setupFile
+        return self.noteName
 
-    def set_setup(self, setupFile):
+    def set_setup(self, noteName):
         """
         Record the name of the spectrum file used for setup, then read values
         """
-        self.setupFile = str(setupFile)
-        self.obs.read_spec_ast(self.setupFile)    # read the parameters
+        self.noteName = str(noteName)
+        self.obs.read_spec_ast(self.noteName)    # read the parameters
 
     def set_obstype(self, obstype):
         """
@@ -285,7 +305,10 @@ class ra_integrate(gr.sync_block):
         """
         Set the type of calibration desired for plotting
         """
-        self.units = int(units)
+        if type(units) is int:
+            self.units = int(units)
+        else:
+            self.units = 0
         print "Units     : ", radioastronomy.unitlabels[self.units]
 
     def set_tcold(self, tcold):
@@ -453,51 +476,51 @@ class ra_integrate(gr.sync_block):
             # deal with average state
             if self.inttype == radioastronomy.INTWAIT:
                 self.ave.ydataB = spec
-                self.nave = 1
+                self.nintegrate = 1
                 self.ave.ydataA = spec
                 self.startutc = now
                 self.obs.utc = now
                 self.obs.count = self.obs.nmedian
             else: # else averaging and maybe writing
                 self.ave.ydataB = self.ave.ydataB + spec
-                self.nave = self.nave + 1
-                oneovern = 1./np.float(self.nave)
+                self.nintegrate = self.nintegrate + 1
+                oneovern = 1./np.float(self.nintegrate)
                 self.ave.ydataA = oneovern*self.ave.ydataB
                 # total number of spectra averaged 
                 # is the number medianed times the number averaged
-                self.ave.count = self.obs.nmedian*self.nave
+                self.ave.count = self.obs.nmedian*self.nintegrate
                 self.ave.utc, duration = radioastronomy.aveutcs(self.startutc, now)
                 self.ave.durationsec = duration
                 # only record aveaged spectra
                 # now, if updating hot, cold or references spectra
                 # if saving files, must reload any configuration changes updated by the sinks
-                if (self.inttype == radioastronomy.INTSAVE) and (self.nave % 10 == 1):
+                if (self.inttype == radioastronomy.INTSAVE) and (self.nintegrate % 20 == 1):
                     if self.obstype == radioastronomy.OBSHOT:
-                        self.hot.read_spec_ast(self.setupFile)    # read the parameters 
+                        self.hot.read_spec_ast(self.noteName)    # read the parameters 
                     elif self.obstype == radioastronomy.OBSCOLD:
-                        self.cold.read_spec_ast(self.setupFile)    # read the parameters 
+                        self.cold.read_spec_ast(self.noteName)    # read the parameters 
                     elif self.obstype == radioastronomy.OBSREF:
-                        self.ref.read_spec_ast(self.setupFile)    # read the parameters 
+                        self.ref.read_spec_ast(self.noteName)    # read the parameters 
                 if self.obstype == radioastronomy.OBSHOT:
                     self.hot.ydataA = np.maximum(self.ave.ydataA[0:self.vlen], self.epsilons[0:self.vlen])
-                    self.hot.nave = self.nave
+                    self.hot.nave = self.nintegrate
                     self.hot.count = self.ave.count
                     self.hot.utc = self.ave.utc
                     self.hot.durationsec = self.ave.durationsec
                 elif self.obstype == radioastronomy.OBSCOLD:
                     self.cold.ydataA = np.maximum(self.ave.ydataA[0:self.vlen], self.epsilons[0:self.vlen])
-                    self.cold.nave = self.nave
+                    self.cold.nave = self.nintegrate
                     self.cold.count = self.ave.count
                     self.cold.utc = self.ave.utc
                     self.cold.durationsec = self.ave.durationsec
                 elif self.obstype == radioastronomy.OBSREF:
                     self.ref.ydataA = np.maximum(self.ave.ydataA[0:self.vlen], self.epsilons[0:self.vlen])
-                    self.ref.nave = self.nave
+                    self.ref.nave = self.nintegrate
                     self.ref.count = self.ave.count
                     self.ref.utc = self.ave.utc
                     self.ref.durationsec = self.ave.durationsec
                 # if writing files, reduce write rate
-                if (self.inttype == radioastronomy.INTSAVE) and (self.nave % 10 == 1):
+                if (self.inttype == radioastronomy.INTSAVE) and (self.nintegrate % 20 == 1):
                     if self.obstype == radioastronomy.OBSHOT:
                         self.hot.write_ascii_file("./", HOTFILE)
                     elif self.obstype == radioastronomy.OBSCOLD:
@@ -512,7 +535,7 @@ class ra_integrate(gr.sync_block):
             self.hot.ydataA[0:1] = self.hot.ydataA[2]
             self.cold.ydataA[0:1] = self.cold.ydataA[2]
             self.ref.ydataA[0:1] = self.ref.ydataA[2]
-            self.ave.nave = self.nave
+            self.ave.nave = self.nintegrate
             # since the data rate should be low, nout will usually be 0
             # now have all spectra, decide plot format
             if self.units == radioastronomy.UNITCOUNTS:
@@ -565,12 +588,13 @@ class ra_integrate(gr.sync_block):
             label = radioastronomy.unitlabels[self.units]
             dt = now - self.printutc
             if dt.total_seconds() > self.printinterval:
+
                 if self.units == 0:
-                    print "%s %5d Max %9.3f Min: %9.3f Median: %9.3f %s " % (yymmdd, self.nave, vmax, vmin, vmed, label)
+                    print "%s Max %9.3f Min: %9.3f Median: %9.3f %s " % (yymmdd, vmax, vmin, vmed, label)
                 elif self.units == 1:
-                    print "%s %5d Max %9.3f Min: %9.3f Median: %9.3f %s " % (yymmdd, self.nave, vmax, vmin, vmed, label)
+                    print "%s Max %9.3f Min: %9.3f Median: %9.3f %s " % (yymmdd, vmax, vmin, vmed, label)
                 else: 
-                    print "%s %5d Max %9.1f Min: %9.1f Median: %9.1f %s " % (yymmdd, self.nave, vmax, vmin, vmed, label)
+                    print "%s Max %9.1f Min: %9.1f Median: %9.1f %s " % (yymmdd, vmax, vmin, vmed, label)
                 sys.stdout.write("\033[F")
                 self.printutc = now
         # end for all input vectors
