@@ -200,6 +200,9 @@ class ra_integrate(gr.sync_block):
         n0 = self.obs.centerFreqHz - (self.obs.bandwidthHz/2.)
         nu = n0
         print "Setting Frequency: %10.0f Hz" % (self.obs.centerFreqHz)
+        nx = len( self.obs.xdata)
+        if nx != self.vlen:
+            self.update_len(self.obs)
         for iii in range(self.vlen):
             self.obs.xdata[iii] = nu
             nu = nu + deltaNu
@@ -216,6 +219,14 @@ class ra_integrate(gr.sync_block):
         deltaNu = self.obs.bandwidthHz/np.float(self.vlen)
         n0 = self.obs.centerFreqHz - (self.obs.bandwidthHz/2.)
         nu = n0
+        if len(self.ave.xdata) != self.vlen:
+            self.update_len(self.ave)
+        if len(self.hot.xdata) != self.vlen:
+            self.update_len(self.hot)
+        if len(self.cold.xdata) != self.vlen:
+            self.update_len(self.cold)
+        if len(self.ref.xdata) != self.vlen:
+            self.update_len(self.ref)
         print "Setting Bandwidth: %10.0f Hz" % (self.obs.bandwidthHz)
         for iii in range(self.vlen):
             self.obs.xdata[iii] = nu
