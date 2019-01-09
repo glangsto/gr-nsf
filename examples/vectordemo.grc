@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.10'?>
 <flow_graph>
   <timestamp>Fri Apr 13 11:15:22 2018</timestamp>
   <block>
@@ -1066,7 +1066,7 @@
     </param>
     <param>
       <key>update_time</key>
-      <value>0.10</value>
+      <value>0.25</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1337,7 +1337,7 @@
     </param>
     <param>
       <key>update_time</key>
-      <value>1</value>
+      <value>0.5</value>
     </param>
     <param>
       <key>vlen</key>
@@ -1546,53 +1546,6 @@
     <param>
       <key>id</key>
       <value>ra_vmedian_0_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>fftsize</value>
-    </param>
-    <param>
-      <key>vdecimate</key>
-      <value>4</value>
-    </param>
-  </block>
-  <block>
-    <key>ra_vmedian</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(400, 564)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>ra_vmedian_0_0_0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -1873,12 +1826,6 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>ra_vmedian_0_0_0</source_block_id>
-    <sink_block_id>ra_vmedian_0_2</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
     <source_block_id>ra_vmedian_0_0_1</source_block_id>
     <sink_block_id>qtgui_vector_sink_f_0_0</sink_block_id>
     <source_key>0</source_key>
@@ -1886,7 +1833,7 @@
   </connection>
   <connection>
     <source_block_id>ra_vmedian_0_1</source_block_id>
-    <sink_block_id>ra_vmedian_0_0_0</sink_block_id>
+    <sink_block_id>ra_vmedian_0_2</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
