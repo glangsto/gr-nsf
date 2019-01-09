@@ -1,5 +1,5 @@
 """
-Event Detection for a sample series for radio astronomy
+Event Detection outputting a time sequence vector centered on the event
 Glen Langston (National Science Foundation)
 """
 #!/usr/bin/env python
@@ -23,15 +23,14 @@ Glen Langston (National Science Foundation)
 # Boston, MA 02110-1301, USA.
 #
 # History
+# 19JAN08 GIL Initial version of vector version of event capture
 # 18OCT12 GIL Initial version of event capture
-# 18SEP02 GIL Changed arguments to on Channels and Off CHannels
-# 18AUG30 GIL Initial version after a number of pylint tests
 
 import datetime
 import numpy as np
 from gnuradio import gr
 
-class ra_event(gr.sync_block):
+class ra_vevent(gr.decim_block):
     """
     Event Capture of a data stream.  The Peak outlier and the RMS are returned.
     Write an event if the peak exceeds the number of sigma of RMS
@@ -47,14 +46,17 @@ class ra_event(gr.sync_block):
         """
         Initialize the event class, zero sample buffer
         """
-        gr.sync_block.__init__(self, name="ra_event",
-                               in_sig=[np.complex],   # in 1 spectrum
-                               out_sig=[np.float32, np.float32])   # out 2 scalar values
+        gr.decim_block.__init__(self, name="ra_event",
+                                in_sig=[np.complex],   # in put samples 1 at a time
+                                # output vector and  2 scalar values
+                                out_sig=[(numpy.complex, int(vlen)), np.float32, np.float32],  
+                                decim=int(vlen))        
         self.vlen = int(vlen)
         self.vlen2 = int(vlen/2)
         self.nsigma = float(nsigma)
         self.nsigma2 = self.nsigma*self.nsigma
         self.sample_rate = float(sample_rate)
+        self.utcend = datetime.datetime.utcnow()
         if self.sample_rate < 10.:
             print 'Invalid Sample Rate: ', self.sample_rate, ' Hz'
             exit()
@@ -101,7 +103,7 @@ class ra_event(gr.sync_block):
         """
         self.utcend = datetime.datetime.utcnow()
         self.utcevent = self.utcend - self.dt
-        self.utcstart = self.utcvent - self.dt
+        self.utcstart = self.utcevent - self.dt
         print 'Utc event: ', self.utcevent, self.magnitude, ' +/- ', self.st
         print 'Magnitude: ', self.magnitude, ' +/- ', self.stddev
 
@@ -109,7 +111,7 @@ class ra_event(gr.sync_block):
         """
         Indicate the number of inputs required to get 1 output spectrum
         """
-        noutput_items = ninput_items
+        noutput_items = self.vlen*ninput_items
         return noutput_items
 
     def work(self, input_items, output_items):
@@ -122,7 +124,7 @@ class ra_event(gr.sync_block):
         ns = len(inn)          # number of samples in this port
 
         noutports = len(output_items)
-        if noutports != 2:
+        if noutports != 3:
             print '!!!!!!! Unexpected number of output ports: ', noutports
         outa = output_items[0]  # all outputs in PORT 0
         outb = output_items[1]  # all outputs in PORT 1
@@ -148,7 +150,7 @@ class ra_event(gr.sync_block):
                 self.full = True
                 self.next = 0
 
-            # upate the check point index
+            # update the check point index
             self.next2 = self.next2 + 1
             if self.next2 >= self.vlen:
                 self.next2 = 0
@@ -172,6 +174,6 @@ class ra_event(gr.sync_block):
         # end for all input samples
         output_items[0] = outa  # put all vectors in output port 0
         output_items[1] = outb  # put all vectors in output port 1
-#        print 'N outputs: ', len(output_items[0]), iout
+        print 'N outputs: ', len(output_items[0]), outa, outb
         return ns
     # end ra_event work()
