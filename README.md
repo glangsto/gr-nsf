@@ -59,7 +59,7 @@ as the goal of the data header is to allow a complete re-observation, based on t
 
 and update your ~/.gnuradio/config.conf file with this path:
 
-`local_blocks_path = ./:../grc:/usr/local/share/gnuradio/grc/blocks/`
+`local_blocks_path = ./:../grc`
 
 Finally run the GRC files:
 
@@ -69,13 +69,16 @@ or
 
 `gnuradio-companion NsfIntegrate60.grc`
 
+To start observing.  This graph assumes you have an AIRSPY mini.  If you have a different device, you'll have
+to edit the graph with the appropriate configuration.
+
 ### Optomizing operation
 
-The hardkernel.com Odriod XU4 octa-core processor can capture all AIRSPY 6 MHz data if the 2 GHz processors are selected.  After recreating the design on your local computer using GRC, then exit and run python from the command line.
+The hardkernel.com Odriod XU4 octa-core processor can capture all 6 MHz of data from an AIRSPY-mini, if the 2 GHz processors are selected.  After recreating the design on your local computer using GRC, then exit and run python from the command line.
 
 The linux 'taskset' command can be used to select the 2 GHz processors (number 4,5,6 and 7):
 
-`taskset -c 4,5,6,7 python NsfIntegrate60.py`
+`taskset -c 7,6,5,4,3 python NsfIntegrate60.py`
 
 You can use the _top_ command to see which processes are using the CPU on your computer.
 
