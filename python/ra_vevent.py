@@ -29,10 +29,15 @@ Glen Langston (National Science Foundation)
 import datetime
 import numpy as np
 from gnuradio import gr
+#import numba
 
 EVENT_MONITOR = 1
 EVENT_DETECT = 2
 EVENT_WRITE = 3
+
+#@numba.vectorize([numba.float64(numba.complex128),numba.float32(numba.complex64)])
+def abs2(x):
+    return x.real**2 + x.imag**2
 
 class ra_vevent(gr.decim_block):
     """
@@ -57,9 +62,9 @@ class ra_vevent(gr.decim_block):
         Initialize the event class, zero sample buffer
         """
         gr.decim_block.__init__(self, name="ra_event",
-                                in_sig=[np.complex],   # in put samples 1 at a time
+                                in_sig=[np.complex64],   # in put samples 1 at a time
                                 # output vector and  2 scalar values
-                                out_sig=[(np.complex, int(vlen)),
+                                out_sig=[(np.complex64, int(vlen)),
                                          np.float32, np.float32],
                                 decim=int(vlen))        
         self.vlen = int(vlen)
@@ -68,9 +73,12 @@ class ra_vevent(gr.decim_block):
         self.nsigma = float(nsigma)
         self.nsigma2 = self.nsigma*self.nsigma
         self.sample_rate = float(sample_rate)
+        self.rmssum2 = 0.
+        self.rms2 = 0.
         # initialize event times
-        self.values = np.zeros(self.vlen, dtype=np.complex)  # vector of data currently stored
-        self.vevent = np.zeros(self.vlen, dtype=np.complex)# vector of last event found
+        self.values = np.zeros(self.vlen, dtype=np.complex64)  # vector of data currently stored
+        self.value2s = np.zeros(self.vlen)  # vector of data currently stored
+        self.vevent = np.zeros(self.vlen, dtype=np.complex64)# vector of last event found
         self.nin = 0     # counter for samples for outputting next vector (<= vlen)
         self.ecount = 0  # count of events detected so far
         if self.sample_rate < 1000.:
@@ -80,6 +88,8 @@ class ra_vevent(gr.decim_block):
         self.dt = float(self.vlen2)/self.sample_rate
         self.dutc = datetime.timedelta(seconds=self.dt)
         self.eventutc = datetime.datetime.utcnow() - self.dutc
+        self.emagnitude = 0.            # event magnitude
+        self.erms = 0.                  # event RMS
         print 'ra_event Vlen, Nsigma, dt: ', self.vlen, self.nsigma, self.dt
         if self.vlen < 16:
             print 'Not Enough samples (<16) to measure RMS: ', self.vlen
@@ -96,14 +106,12 @@ class ra_vevent(gr.decim_block):
         self.next = int(0) # next is where the next sample will be placed
         self.next2 = int(self.vlen2)  # next2 sample examined for an event
         # keep magnitudes
-        self.values = np.zeros(self.vlen, dtype=np.complex)
-        self.value2s = np.zeros(self.vlen, dtype=np.complex)
-        self.rms = 0.
+        self.values = np.zeros(self.vlen, dtype=np.complex64)
+        self.value2s = np.zeros(self.vlen)
         self.rms2 = 0.
-        self.rmssum = 0.
+        self.rmssum2 = 0.
         self.oneovern = 1./float(self.vlen)
         self.full = False              # start with circular buffer empty
-        self.ecount = 0
 
     def set_mode(self, mode):
         """ 
@@ -156,8 +164,8 @@ class ra_vevent(gr.decim_block):
         writeevent() writes an ascii file containing the observing setup
         and the data stream
         """
-        print 'Utc event: ', self.utcevent, self.magnitude, ' +/- ', self.stddev
-        print 'Magnitude: ', self.magnitude, ' +/- ', self.stddev
+        print 'Utc event: ', self.utcevent, self.emagnitude, ' +/- ', self.erms
+        print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
 
     def forecast(self, noutput_items, ninput_items):
         """
@@ -176,7 +184,7 @@ class ra_vevent(gr.decim_block):
         """
         inn = input_items[0]    # input complex samples
         # vector optimized magnitude calculator
-        mag2s = np.einsum('...i,...i', inn, inn)
+        mag2s = inn.real**2 + inn.imag**2
 
         # get the number of input samples
         ns = len(inn)           # number of samples in this port
@@ -193,12 +201,12 @@ class ra_vevent(gr.decim_block):
         for j in range(ns):
             # if buffer is already full, must replace value with new
             if self.full:
-                self.rmssum = self.rmssum - self.value2s[self.next]
+                self.rmssum2 = self.rmssum2 - self.value2s[self.next]
                 
             # record the new values (maybe on top of previous
             self.values[self.next] = inn[j]
-            self.value2s[self.next] = mags[j]
-            self.rmssum = self.rmssum + mags[j]
+            self.value2s[self.next] = mag2s[j]
+            self.rmssum2 = self.rmssum2 + mag2s[j]
 
             # now handle circular buffer and detect full buffer
             self.next = self.next + 1
@@ -214,7 +222,7 @@ class ra_vevent(gr.decim_block):
                 if self.ecount <= 0 or self.mode <= EVENT_MONITOR: 
                     self.vevent = self.values
                     self.emagnitude = np.sqrt(max( self.value2s))
-                    self.erms = np.sqrt(rms2)
+                    self.erms = np.sqrt(self.rms2)
                     self.eventutc = datetime.datetime.utcnow() - self.dutc
                 
                 outa[nout] = self.vevent  # ouput vector of samples
@@ -232,15 +240,15 @@ class ra_vevent(gr.decim_block):
                 # finally if full buffer and event found
                 if self.value2s[self.next2] > (self.nsigma2*self.rms2):
                     # an event is found!
-                    self.magnitude = np.sqrt(self.values2[self.next2])
-                    self.stddev = np.sqrt(self.rms2)
+                    self.emagnitude = np.sqrt(self.value2s[self.next2])
+                    self.erms = np.sqrt(self.rms2)
                     # deal with circular buffer in centering output event:
                     iout = self.vlen2
                     iin = self.next2
-                    self.eventutc = datetime.now() - dt
+                    self.eventutc = datetime.datetime.utcnow() - self.dutc
                     # must transfer an entire event, lenght vlen
                     for iii in range(self.vlen):
-                        self.event[iout] = self.values[iin]
+                        self.vevent[iout] = self.values[iin]
                         iout = iout + 1
                         iin = iin + 1
                         if iout >= self.vlen:
@@ -251,7 +259,7 @@ class ra_vevent(gr.decim_block):
                     if self.mode >= EVENT_WRITE:
                         self.writeevent()  # record
                     self.ecount = self.ecount + 1   # keep event count
-                    self.initbuffer()      # start again
+                    self.init_buffer()      # start again
 
         if nout > 0:
             output_items[0] = outa
