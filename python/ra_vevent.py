@@ -39,35 +39,34 @@ except:
     print ""
     print "Good Luck! -- Glen"
     
-
 EVENT_MONITOR = 1
 EVENT_DETECT = 2
 
 class ra_vevent(gr.decim_block):
     """
-    Event Capture of a data stream.  The Peak outlier and the RMS are returned.
-    Write an event if the peak exceeds the number of sigma of RMS
-    This is defined as: stdev = sqrt((sum_x2 / n) - (mean * mean))
-    For RF signals the mean is zero, so the calculation is simplified.
+    Event Capture in a data stream.  The Peak magnitude of the outlier and 
+    the RMS are returned along with a vector of samples centered on the evet.
+    Detect an event if the peak exceeds the number of sigma of RMS
     Input:
-    1: Stream of complex I/Q samples
+    1: Stream of complex (I/Q) samples
     2: vector length - number of complex samples to save
-    3: mode - 1: monitor - 2: detect - 3: detect and write
+    3: mode - 1: monitor - 2: detect
     3: nsigma - Number of Sigma required to declare an event
     4: sample-rate - Hz
     Output:
-    1: Vector of complex samples - Latest data if no events
+    1: Vector of complex samples - Latest data if no events yet
     2: Peak magnitude
-    3: Sigma of latest detection.
-    4: Modified julian Date of event
+    3: RMS of data with event
+    4: Modified julian Date of Event
+    Glen Langston - National Science Foundation - 2019 Januar 13
     """
     def __init__(self, vlen, mode, nsigma, sample_rate):
         """
         Initialize the event class, zero sample buffer
         """
         gr.decim_block.__init__(self, name="ra_vevent",
-                                in_sig=[np.complex64],   # in put samples 1 at a time
-                                # output vector and  2 scalar values
+                                in_sig=[np.complex64],   # input I/Q pairs
+                                # output vector and  3 scalar values
                                 out_sig=[(np.complex64, int(vlen)),
                                          np.float32, np.float32, np.float32],
                                 decim=int(vlen))        
