@@ -23,6 +23,7 @@ Glen Langston (National Science Foundation)
 # Boston, MA 02110-1301, USA.
 #
 # History
+# 19JAN13 GIL Working version of vector version of event capture
 # 19JAN08 GIL Initial version of vector version of event capture
 # 18OCT12 GIL Initial version of event capture
 
