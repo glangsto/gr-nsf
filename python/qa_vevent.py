@@ -36,19 +36,19 @@ class qa_vevent (gr_unittest.TestCase):
         V = V1 + (V2*1j)
         # create a set of vectors
         src = blocks.vector_source_c( V.tolist())
-        instream = blocks.vector_to_stream( gr.sizeof_float, vsize)
+        instream = blocks.vector_to_stream( gr.sizeof_gr_complex, vsize)
 
         # setup for running test
         mode = 1
         nsigma = 5.
         sample_rate = 1.e6
-        configFileName = "foo.txt"
         # block we're testing
-        vblock = ra_vevent( vsize, mode, nsigma, sample_rate, configFileName)
+        vblock = ra_vevent( vsize, mode, nsigma, sample_rate)
 
         vsnk = blocks.vector_sink_c(vsize)
         magsnk = blocks.null_sink(1)
         rmssnk = blocks.null_sink(1)
+        utcsnk = blocks.null_sink(1)
 
         self.tb.connect (src, instream)
         self.tb.connect (instream, vblock)
@@ -56,6 +56,7 @@ class qa_vevent (gr_unittest.TestCase):
         self.tb.connect (vblock, vsnk, 0)
         self.tb.connect (vblock, magsnk, 1)
         self.tb.connect (vblock, rmssnk, 2)
+        self.tb.connect (vblock, utcsnk, 3)
 #        self.tb.connect (v2s, snk)
         expected = V[0:vsize]
         print 'Expected: ', expected[0:7]

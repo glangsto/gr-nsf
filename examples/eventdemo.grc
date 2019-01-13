@@ -22,7 +22,7 @@
     </param>
     <param>
       <key>description</key>
-      <value>This GRC demo tests the event detection</value>
+      <value>This demo tests the event detection block</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -78,7 +78,7 @@
     </param>
     <param>
       <key>title</key>
-      <value>Event detection test</value>
+      <value>Event Detection Demo</value>
     </param>
   </block>
   <block>
@@ -109,14 +109,14 @@
     </param>
   </block>
   <block>
-    <key>variable_qtgui_range</key>
+    <key>variable_qtgui_chooser</key>
     <param>
       <key>comment</key>
       <value></value>
     </param>
     <param>
       <key>value</key>
-      <value>5.</value>
+      <value>2</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -124,11 +124,110 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(223, 311)</value>
+      <value>(175, 267)</value>
     </param>
     <param>
       <key>gui_hint</key>
+      <value>0,0,2,1</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>mode</value>
+    </param>
+    <param>
+      <key>label0</key>
+      <value>Monitor</value>
+    </param>
+    <param>
+      <key>label1</key>
+      <value>Detect</value>
+    </param>
+    <param>
+      <key>label2</key>
+      <value>Write</value>
+    </param>
+    <param>
+      <key>label3</key>
       <value></value>
+    </param>
+    <param>
+      <key>label4</key>
+      <value></value>
+    </param>
+    <param>
+      <key>label</key>
+      <value>Event Mode</value>
+    </param>
+    <param>
+      <key>labels</key>
+      <value>[]</value>
+    </param>
+    <param>
+      <key>num_opts</key>
+      <value>3</value>
+    </param>
+    <param>
+      <key>option0</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>option1</key>
+      <value>2</value>
+    </param>
+    <param>
+      <key>option2</key>
+      <value>3</value>
+    </param>
+    <param>
+      <key>option3</key>
+      <value>3</value>
+    </param>
+    <param>
+      <key>option4</key>
+      <value>4</value>
+    </param>
+    <param>
+      <key>options</key>
+      <value>[0, 1, 2]</value>
+    </param>
+    <param>
+      <key>orient</key>
+      <value>Qt.QVBoxLayout</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>int</value>
+    </param>
+    <param>
+      <key>widget</key>
+      <value>combo_box</value>
+    </param>
+  </block>
+  <block>
+    <key>variable_qtgui_range</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>3.6</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(311, 315)</value>
+    </param>
+    <param>
+      <key>gui_hint</key>
+      <value>0,3,5,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -144,7 +243,7 @@
     </param>
     <param>
       <key>min_len</key>
-      <value>200</value>
+      <value>100</value>
     </param>
     <param>
       <key>orient</key>
@@ -160,7 +259,7 @@
     </param>
     <param>
       <key>stop</key>
-      <value>20.</value>
+      <value>10.</value>
     </param>
     <param>
       <key>rangeType</key>
@@ -196,65 +295,6 @@
     <param>
       <key>value</key>
       <value>1e6</value>
-    </param>
-  </block>
-  <block>
-    <key>Ra_Vevent</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>configFile</key>
-      <value>Watch.not</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(503, 411)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>Ra_Vevent_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>mode</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>nsigma</key>
-      <value>nsigma</value>
-    </param>
-    <param>
-      <key>sample_rate</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>fftsize</value>
     </param>
   </block>
   <block>
@@ -458,7 +498,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(232, 84)</value>
+      <value>(231, 87)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -619,7 +659,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(559, 235)</value>
+      <value>(559, 211)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -678,11 +718,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(766, 443)</value>
+      <value>(774, 351)</value>
     </param>
     <param>
       <key>gui_hint</key>
-      <value></value>
+      <value>0,8,3,1</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -710,7 +750,7 @@
     </param>
     <param>
       <key>label1</key>
-      <value></value>
+      <value>Magnitude</value>
     </param>
     <param>
       <key>unit1</key>
@@ -742,7 +782,7 @@
     </param>
     <param>
       <key>label2</key>
-      <value></value>
+      <value>RMS</value>
     </param>
     <param>
       <key>unit2</key>
@@ -758,7 +798,7 @@
     </param>
     <param>
       <key>label3</key>
-      <value></value>
+      <value>Event Mjd</value>
     </param>
     <param>
       <key>unit3</key>
@@ -874,7 +914,7 @@
     </param>
     <param>
       <key>nconnections</key>
-      <value>2</value>
+      <value>3</value>
     </param>
     <param>
       <key>update_time</key>
@@ -1280,7 +1320,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(759, 219)</value>
+      <value>(759, 195)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1607,24 +1647,61 @@
       <value>-3</value>
     </param>
   </block>
-  <connection>
-    <source_block_id>Ra_Vevent_0</source_block_id>
-    <sink_block_id>qtgui_number_sink_0</sink_block_id>
-    <source_key>1</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>Ra_Vevent_0</source_block_id>
-    <sink_block_id>blocks_vector_to_stream_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>Ra_Vevent_0</source_block_id>
-    <sink_block_id>qtgui_number_sink_0</sink_block_id>
-    <source_key>2</source_key>
-    <sink_key>1</sink_key>
-  </connection>
+  <block>
+    <key>ra_vevent</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(527, 319)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ra_vevent_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>mode</key>
+      <value>mode</value>
+    </param>
+    <param>
+      <key>nsigma</key>
+      <value>nsigma</value>
+    </param>
+    <param>
+      <key>sample_rate</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>fftsize</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>analog_noise_source_x_0</source_block_id>
     <sink_block_id>blocks_add_xx_0</sink_block_id>
@@ -1657,13 +1734,13 @@
   </connection>
   <connection>
     <source_block_id>blocks_throttle_0</source_block_id>
-    <sink_block_id>Ra_Vevent_0</sink_block_id>
+    <sink_block_id>blocks_delay_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
     <source_block_id>blocks_throttle_0</source_block_id>
-    <sink_block_id>blocks_delay_0</sink_block_id>
+    <sink_block_id>ra_vevent_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -1672,5 +1749,29 @@
     <sink_block_id>qtgui_time_sink_x_0_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>qtgui_number_sink_0</sink_block_id>
+    <source_key>3</source_key>
+    <sink_key>2</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>qtgui_number_sink_0</sink_block_id>
+    <source_key>1</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>blocks_vector_to_stream_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>qtgui_number_sink_0</sink_block_id>
+    <source_key>2</source_key>
+    <sink_key>1</sink_key>
   </connection>
 </flow_graph>

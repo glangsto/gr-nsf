@@ -30,13 +30,18 @@ import datetime
 import numpy as np
 from gnuradio import gr
 import copy
+try:
+    import jdutil
+except:
+    print "jdutil is needed to compute Modified Julian Days"
+    print "try:"
+    print "git clone https://github.com/jiffyclub/jdutil.py"
+    print ""
+    print "Good Luck! -- Glen"
+    
 
 EVENT_MONITOR = 1
 EVENT_DETECT = 2
-EVENT_WRITE = 3
-
-def abs2(x):
-    return x.real**2 + x.imag**2
 
 class ra_vevent(gr.decim_block):
     """
@@ -50,21 +55,21 @@ class ra_vevent(gr.decim_block):
     3: mode - 1: monitor - 2: detect - 3: detect and write
     3: nsigma - Number of Sigma required to declare an event
     4: sample-rate - Hz
-    5: configFileName - File describing the observing setup
     Output:
-    Vector of complex samples - Latest data if no events
-    Peak magnitude
-    Sigma of latest detection.
+    1: Vector of complex samples - Latest data if no events
+    2: Peak magnitude
+    3: Sigma of latest detection.
+    4: Modified julian Date of event
     """
-    def __init__(self, vlen, mode, nsigma, sample_rate, configFileName):
+    def __init__(self, vlen, mode, nsigma, sample_rate):
         """
         Initialize the event class, zero sample buffer
         """
-        gr.decim_block.__init__(self, name="ra_event",
+        gr.decim_block.__init__(self, name="ra_vevent",
                                 in_sig=[np.complex64],   # in put samples 1 at a time
                                 # output vector and  2 scalar values
                                 out_sig=[(np.complex64, int(vlen)),
-                                         np.float32, np.float32],
+                                         np.float32, np.float32, np.float32],
                                 decim=int(vlen))        
         self.vlen = int(vlen)
         self.vlen2 = int(vlen/2)
@@ -87,6 +92,7 @@ class ra_vevent(gr.decim_block):
         self.dt = float(self.vlen2)/self.sample_rate
         self.dutc = datetime.timedelta(seconds=self.dt)
         self.eventutc = datetime.datetime.utcnow() - self.dutc
+        self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
         self.emagnitude = 0.            # event magnitude
         self.erms = 0.                  # event RMS
         print 'ra_event Vlen, Nsigma, dt: ', self.vlen, self.nsigma, self.dt
@@ -94,7 +100,6 @@ class ra_vevent(gr.decim_block):
             print 'Not Enough samples (<16) to measure RMS: ', self.vlen
             exit()
         self.init_buffer()
-        self.configFileName = str(configFileName)
 
     def init_buffer(self):
         """
@@ -117,10 +122,9 @@ class ra_vevent(gr.decim_block):
         Set the event detection mode: One of 
         EVENT_MONITOR: report magnitude and RMS of every vector of data
         EVENT_DETECT:  report only the magnitude and RMS of signficant events
-        EVENT_WRITE:   Report and Write signficant Events
         """
         mode = int(mode)
-        if (mode < EVENT_MONITOR) or (mode > EVENT_WRITE):
+        if (mode < EVENT_MONITOR) or (mode > EVENT_DETECT):
             print "Invalid Mode value: ", mode
             mode = EVENT_MONITOR
         self.mode = mode
@@ -190,11 +194,12 @@ class ra_vevent(gr.decim_block):
         ns = len(inn)           # number of samples in this port
 
         noutports = len(output_items)
-        if noutports != 3:
+        if noutports != 4:
             print '!!!!!!! Unexpected number of output ports: ', noutports
         outa = output_items[0]  # all outputs in PORT 0
         outb = output_items[1]  # all outputs in PORT 1
         outc = output_items[2]  # all outputs in PORT 2
+        outd = output_items[3]  # all outputs in PORT 3
         nout = 0                # count number of output items
 
         # run through all input samples
@@ -210,7 +215,7 @@ class ra_vevent(gr.decim_block):
 
             # now handle circular buffer and detect full buffer
             self.next = self.next + 1
-            # determine when buffer is full.  always write an event,
+            # determine when buffer is full.  always output an event,
             # end cycling around the buffer
             if self.next >= self.vlen:
                 self.full = True
@@ -224,10 +229,12 @@ class ra_vevent(gr.decim_block):
                     self.emagnitude = np.sqrt(max( self.value2s))
                     self.erms = np.sqrt(self.rms2)
                     self.eventutc = datetime.datetime.utcnow() - self.dutc
-                
+                    self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+
                 outa[nout] = self.vevent  # ouput vector of samples
                 outb[nout] = self.emagnitude
                 outc[nout] = self.erms
+                outd[nout] = self.eventmjd
                 nout = nout + 1
 
             # once vector is full, next2 is the place to look for the last event
@@ -246,6 +253,8 @@ class ra_vevent(gr.decim_block):
                     iout = self.vlen2
                     iin = self.next2
                     self.eventutc = datetime.datetime.utcnow() - self.dutc
+                    self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+
                     # must transfer an entire event, lenght vlen
                     for iii in range(self.vlen):
                         self.vevent[iout] = self.values[iin]
@@ -256,11 +265,10 @@ class ra_vevent(gr.decim_block):
                         if iin >= self.vlen:
                             iin = 0
                     # if writing evevents
-                    if self.mode >= EVENT_WRITE:
-                        self.writeevent()  # record
                     self.ecount = self.ecount + 1   # keep event count
                     print 'Event: ', self.ecount
                     print 'Utc event: ', self.eventutc
+                    print 'Utc MJD  : ', self.eventmjd
                     print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
                     self.init_buffer()      # start again
 
@@ -268,6 +276,7 @@ class ra_vevent(gr.decim_block):
             output_items[0] = outa
             output_items[1] = outb
             output_items[2] = outc
+            output_items[3] = outd
         # end for all input samples
         
         return nout

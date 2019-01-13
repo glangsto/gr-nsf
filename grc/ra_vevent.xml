@@ -1,26 +1,19 @@
 <?xml version="1.0"?>
 <block>
-  <name>Ra_Vevent</name>
-  <key>Ra_Vevent</key>
+  <name>Vevent</name>
+  <key>ra_vevent</key>
   <category>[ra]</category>
   <import>import ra_vevent</import>
-  <make>ra_vevent.ra_vevent($vlen, $mode, $nsigma, $sample_rate, $configFile)</make>
+  <make>ra_vevent.ra_vevent($vlen, $mode, $nsigma, $sample_rate)</make>
+  <callback>set_vlen( $vlen)</callback>
   <callback>set_mode( $mode)</callback>
   <callback>set_nsigma( $nsigma)</callback>
   <callback>set_sample_rate( $sample_rate)</callback>
-  <callback>set_configFile( $configFile)</callback>
-  <callback>set_vlen( $vlen)</callback>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
-  <param>
-    <name>Config File</name>
-    <key>configFile</key>
-    <value>Watch.not</value>
-    <type>string</type>
-  </param>
   <param>
     <name>Mode</name>
     <key>mode</key>
@@ -54,7 +47,6 @@
     <name>in</name>
     <type>complex</type>
   </sink>
-
   <!-- Make one 'source' node per output. Sub-nodes:
        * name (an identifier for the GUI)
        * type
@@ -68,9 +60,16 @@
   <source>
     <name>magnitude</name>
     <type>float</type>
+    <vlen>1</vlen>
   </source>
   <source>
     <name>stddev</name>
     <type>float</type>
+    <vlen>1</vlen>
+  </source>
+  <source>
+    <name>eventmjd</name>
+    <type>float</type>
+    <vlen>1</vlen>
   </source>
 </block>
