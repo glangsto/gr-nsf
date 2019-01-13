@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<block>
+  <name>Ra_Vevent</name>
+  <key>Ra_Vevent</key>
+  <category>[ra]</category>
+  <import>import ra_vevent</import>
+  <make>ra_vevent.ra_vevent($vlen, $mode, $nsigma, $sample_rate, $configFile)</make>
+  <callback>set_mode( $mode)</callback>
+  <callback>set_nsigma( $nsigma)</callback>
+  <callback>set_sample_rate( $sample_rate)</callback>
+  <callback>set_configFile( $configFile)</callback>
+  <callback>set_vlen( $vlen)</callback>
+  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
+       Sub-nodes:
+       * name
+       * key (makes the value accessible as $keyname, e.g. in the make node)
+       * type -->
+  <param>
+    <name>Config File</name>
+    <key>configFile</key>
+    <value>Watch.not</value>
+    <type>string</type>
+  </param>
+  <param>
+    <name>Mode</name>
+    <key>mode</key>
+    <value>1</value>
+    <type>int</type>
+  </param>
+  <param>
+    <name>N sigma</name>
+    <key>nsigma</key>
+    <value>10.</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Sample Rate (Hz)</name>
+    <key>sample_rate</key>
+    <value>3.E6</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Vec Length</name>
+    <key>vlen</key>
+    <value>128</value>
+    <type>int</type>
+  </param>
+  <!-- Make one 'sink' node per input. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+  <sink>
+    <name>in</name>
+    <type>complex</type>
+  </sink>
+
+  <!-- Make one 'source' node per output. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+  <source>
+    <name>out</name>
+    <type>complex</type>
+    <vlen>$vlen</vlen>
+  </source>
+  <source>
+    <name>magnitude</name>
+    <type>float</type>
+  </source>
+  <source>
+    <name>stddev</name>
+    <type>float</type>
+  </source>
+</block>
