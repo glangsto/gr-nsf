@@ -29,13 +29,12 @@ Glen Langston (National Science Foundation)
 import datetime
 import numpy as np
 from gnuradio import gr
-#import numba
+import copy
 
 EVENT_MONITOR = 1
 EVENT_DETECT = 2
 EVENT_WRITE = 3
 
-#@numba.vectorize([numba.float64(numba.complex128),numba.float32(numba.complex64)])
 def abs2(x):
     return x.real**2 + x.imag**2
 
@@ -80,7 +79,7 @@ class ra_vevent(gr.decim_block):
         self.value2s = np.zeros(self.vlen)  # vector of data currently stored
         self.vevent = np.zeros(self.vlen, dtype=np.complex64)# vector of last event found
         self.nin = 0     # counter for samples for outputting next vector (<= vlen)
-        self.ecount = 0  # count of events detected so far
+        self.ecount = np.int_(0)  # count of events detected so far
         if self.sample_rate < 1000.:
             print 'Invalid Sample Rate: ', self.sample_rate, ' Hz'
             exit()
@@ -131,12 +130,12 @@ class ra_vevent(gr.decim_block):
         Set the Sigma detection threshold level
         """
         nsigma = float(nsigma)
-        if nsigma < 1: 
+        if nsigma < 0.1: 
             print "Invalid Nsigma value: ", nsigma
-            nsigma = 7
-            print "Using   Nsigma value: ", nsigma
+            nsigma = 5.
         self.nsigma = nsigma
         self.nsigma2 = self.nsigma*self.nsigma
+        print "Using   Nsigma value: ", self.nsigma
 
     def set_sampleRate(self, sample_rate):
         sample_rate = float(sample_rate)
@@ -146,6 +145,7 @@ class ra_vevent(gr.decim_block):
             print "Using   Sample Rate: ", sample_rate
         self.sample_rate = sample_rate
         self.dt = float(self.vlen2)/self.sample_rate
+        print "Using    Sample Rate: ", self.sample_rate
 
     def set_vlen(self, vlen):
         vlen = int(vlen)
@@ -164,7 +164,7 @@ class ra_vevent(gr.decim_block):
         writeevent() writes an ascii file containing the observing setup
         and the data stream
         """
-        print 'Utc event: ', self.utcevent, self.emagnitude, ' +/- ', self.erms
+        print 'Utc event: ', self.eventutc
         print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
 
     def forecast(self, noutput_items, ninput_items):
@@ -220,7 +220,7 @@ class ra_vevent(gr.decim_block):
 
                 # if no events yet or monitoring, output latest vector
                 if self.ecount <= 0 or self.mode <= EVENT_MONITOR: 
-                    self.vevent = self.values
+                    self.vevent = copy.deepcopy(self.values)
                     self.emagnitude = np.sqrt(max( self.value2s))
                     self.erms = np.sqrt(self.rms2)
                     self.eventutc = datetime.datetime.utcnow() - self.dutc
@@ -259,13 +259,15 @@ class ra_vevent(gr.decim_block):
                     if self.mode >= EVENT_WRITE:
                         self.writeevent()  # record
                     self.ecount = self.ecount + 1   # keep event count
+                    print 'Event: ', self.ecount
+                    print 'Utc event: ', self.eventutc
+                    print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
                     self.init_buffer()      # start again
 
         if nout > 0:
             output_items[0] = outa
             output_items[1] = outb
             output_items[2] = outc
-        print 'N outputs: ', nout, self.rms2
         # end for all input samples
         
         return nout
