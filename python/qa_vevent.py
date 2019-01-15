@@ -34,16 +34,20 @@ class qa_vevent (gr_unittest.TestCase):
         V1 = np.random.random_sample(m) # 1 many values
         V2 = np.random.random_sample(m) # 1 many values
         V = V1 + (V2*1j)
+        Vmag = V*V
         # create a set of vectors
         src = blocks.vector_source_c( V.tolist())
+        mag = blocks.vector_source_c( Vmag.tolist())
         instream = blocks.vector_to_stream( gr.sizeof_gr_complex, vsize)
+        in2stream = blocks.vector_to_stream( gr.sizeof_gr_complex, vsize)
 
         # setup for running test
         mode = 1
         nsigma = 5.
         sample_rate = 1.e6
+        sample_delay = 3./sample_rate
         # block we're testing
-        vblock = ra_vevent( vsize, mode, nsigma, sample_rate)
+        vblock = ra_vevent( vsize, mode, nsigma, sample_rate, sample_delay)
 
         vsnk = blocks.vector_sink_c(vsize)
         magsnk = blocks.null_sink(1)
@@ -51,7 +55,9 @@ class qa_vevent (gr_unittest.TestCase):
         utcsnk = blocks.null_sink(1)
 
         self.tb.connect (src, instream)
-        self.tb.connect (instream, vblock)
+        self.tb.connect (mag, in2stream)
+        self.tb.connect (instream, vblock, 0)
+        self.tb.connect (in2stream, vblock, 1)
         # now connect test bolck outputs a fector and two magnitudes
         self.tb.connect (vblock, vsnk, 0)
         self.tb.connect (vblock, magsnk, 1)
