@@ -23,6 +23,8 @@ Glen Langston (National Science Foundation)
 # Boston, MA 02110-1301, USA.
 #
 # History
+# 19JAN15 GIL cleanup and document; remove writing to another block
+# 19JAN14 GIL move magnitude calculation to another block
 # 19JAN13 GIL Working version of vector version of event capture
 # 19JAN08 GIL Initial version of vector version of event capture
 # 18OCT12 GIL Initial version of event capture
@@ -50,23 +52,27 @@ class ra_vevent(gr.decim_block):
     Detect an event if the peak magnitude exceeds the N sigma times RMS.
     Input:
     1: Stream of complex (I/Q) samples
-    2: vector length - number of complex samples to save
-    3: mode - 1: monitor - 2: detect
+    2: Stream of magnitudes^2
+    Parameters
+    1: vector length - number of complex samples to save
+    2: mode - 1: monitor - 2: detect
     3: nsigma - Number of Sigma required to declare an event
     4: sample-rate - Hz
+    5: sample delay (seconds), time until sample arrives at block
     Output:
     1: Vector of complex samples - Latest data if no events yet
     2: Peak magnitude
     3: RMS of data with event
     4: Modified julian Date of Event
-    Glen Langston - National Science Foundation - 2019 Januar 13
+    Glen Langston - National Science Foundation - 2019 Januar 15
     """
-    def __init__(self, vlen, mode, nsigma, sample_rate):
+    def __init__(self, vlen, mode, nsigma, sample_rate, sample_delay):
         """
         Initialize the event class, zero sample buffer
         """
         gr.decim_block.__init__(self, name="ra_vevent",
-                                in_sig=[np.complex64],   # input I/Q pairs
+                                # input I/Q pairs and magnitudes^2 of pairs
+                                in_sig=[np.complex64, np.float32], 
                                 # output vector and  3 scalar values
                                 out_sig=[(np.complex64, int(vlen)),
                                          np.float32, np.float32, np.float32],
@@ -76,13 +82,17 @@ class ra_vevent(gr.decim_block):
             print "ra_vevent: vector length too short:",self.vlen
             exit()
         self.vlen2 = int(vlen/2)
+        self.next = 0                  # where to place the next sample
+        self.next2 = self.vlen2        # where to look for next event
         self.oneovern = 1./float(self.vlen)
+        self.waitcount = self.vlen     # samples until declaring an event
         self.mode = int(mode)
         self.nsigma = float(nsigma)
         self.nsigma2 = self.nsigma*self.nsigma
         # vector of complex data currently stored
         self.values = np.zeros(self.vlen, dtype=np.complex64)  
         self.value2s = np.zeros(self.vlen)  # vector of magnitudes
+        self.full = False
         # vector of last event found
         self.vevent = np.zeros(self.vlen, dtype=np.complex64)
         self.ecount = np.int_(0)  # count of events detected so far
@@ -90,6 +100,8 @@ class ra_vevent(gr.decim_block):
         if self.sample_rate < 100.:
             print 'Invalid Sample Rate: ', self.sample_rate, ' Hz'
             exit()
+        self.delay = float(sample_delay)
+        self.datetime_delay = datetime.timedelta(seconds=self.delay)
         self.rmssum2 = 0.
         self.rms2 = 0.
         # pre compute nsigma * nsigma * rms2
@@ -112,14 +124,7 @@ class ra_vevent(gr.decim_block):
         """
         Initialize the circular buffer at start and after each event is detected
         """
-        # define variables to keep track of the circular buffer
-        self.next = int(0) # next is where the next sample will be placed
-        self.next2 = int(self.vlen2)  # next2 sample examined for an event
-        # keep magnitudes
-        self.values = np.zeros(self.vlen, dtype=np.complex64)
-        self.value2s = np.zeros(self.vlen)
-        self.rms2 = 0.
-        self.rmssum2 = 0.
+        self.waitcount = self.vlen     # samples until declaring an event
         self.full = False              # start with circular buffer empty
 
     def set_mode(self, mode):
@@ -147,7 +152,7 @@ class ra_vevent(gr.decim_block):
         self.nsigmarms2 = self.nsigma2 * self.rms2
         print "Using   Nsigma value: ", self.nsigma
 
-    def set_sampleRate(self, sample_rate):
+    def set_sample_rate(self, sample_rate):
         sample_rate = float(sample_rate)
         if sample_rate < 100.:
             print "Invalid Sample Rate: ", sample_rate
@@ -155,6 +160,13 @@ class ra_vevent(gr.decim_block):
         self.sample_rate = sample_rate
         self.dt = float(self.vlen2)/self.sample_rate
         print "Using    Sample Rate: ", self.sample_rate
+
+    def set_sample_delay(self, sample_delay):
+        sample_delay = float(sample_delay)
+        self.sample_delay = sample_delay
+        self.delay = float(self.vlen2)/self.sample_rate
+        self.datetime_delay = datetime.timedelta(seconds=self.delay)
+        print "Using   Sample Delay: ", self.datetime_delay
 
     def set_vlen(self, vlen):
         vlen = int(vlen)
@@ -245,93 +257,146 @@ class ra_vevent(gr.decim_block):
         Work takes the input data and computes the average peak and RMS
         """
         inn = input_items[0]    # input complex samples
-        # vector optimized magnitude calculator
-        mag2s = inn.real**2 + inn.imag**2
+        mag = input_items[1]    # input magnitudes^2
 
         # get the number of input samples
         ns = len(inn)           # number of samples in this port
 
-        noutports = len(output_items)
+#        noutports = len(output_items)
 #        if noutports != 4:
 #            print '!!!!!!! Unexpected number of output ports: ', noutports
-        outa = output_items[0]  # all outputs in PORT 0
-        outb = output_items[1]  # all outputs in PORT 1
-        outc = output_items[2]  # all outputs in PORT 2
-        outd = output_items[3]  # all outputs in PORT 3
+        outa = output_items[0]  # all outputs in PORT 0; vector of samples
+        outb = output_items[1]  # all outputs in PORT 1; peak magnitude
+        outc = output_items[2]  # all outputs in PORT 2; rms of samples
+        outd = output_items[3]  # all outputs in PORT 3; event mjd 
         nout = 0                # count number of output items
 
-        # run through all input samples
-        for j in range(ns):
-            # if buffer is already full, must replace value with new
-            if self.full:
-                self.rmssum2 = self.rmssum2 - self.value2s[self.next]
+        # this code was optimized to remove some 'ifs' outside the main loop
+        # if the buffer is already full.   The cost is that no event can
+        # be detected until the buffer is full.
+        if self.full:           # if buffer is already full process differently
+            # run through all input samples
+            for j in range(ns):
+                
+                # record the new values (maybe on top of previous
+                self.values[self.next] = inn[j]
+                self.value2s[self.next] = mag[j]
+                self.rmssum2 = self.rmssum2 + self.value2s[self.next]
+
+                # now handle circular buffer and detect full buffer
+                self.next = self.next + 1
+                # determine when buffer is full.
+                # Always output an event each time the buffer cycles
+                # end cycling around the buffer
+                if self.next >= self.vlen:
+                    self.next = 0
+                    # only work with squares until event is found
+                    self.rms2 = self.rmssum2*self.oneovern
+                    # set threshold for the next block of samples
+                    self.nsigmarms2 = self.nsigma2 * self.rms2
+                    self.rmssum2 = 0.   # start new sum
+                    
+                    # if monitoring, output latest vector
+                    if self.mode <= EVENT_MONITOR:
+                        self.vevent = copy.deepcopy(self.values)
+                        self.emagnitude = np.sqrt(max( self.value2s))
+                        self.erms = np.sqrt(self.rms2)
+                        self.eventutc = datetime.datetime.utcnow() - self.dutc
+                        self.eventutc = self.eventutc - self.datetime_delay
+                        self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+                        self.ecount = 1
+                    outa[nout] = self.vevent  # ouput vector of samples
+                    outb[nout] = self.emagnitude
+                    outc[nout] = self.erms
+                    outd[nout] = self.eventmjd
+                    nout = nout + 1
+
+                # next2 is the place to look for the last event
+                self.next2 = self.next2 + 1
+                if self.next2 >= self.vlen:
+                    self.next2 = 0
+
+                # if event found
+                if self.value2s[self.next2] > self.nsigmarms2:
+                    if self.full:       # if still full
+                        # an event is found!
+                        self.emagnitude = np.sqrt(self.value2s[self.next2])
+                        self.erms = np.sqrt(self.rms2)
+                        self.eventutc = datetime.datetime.utcnow()
+                        # offset now for middle of event
+                        self.eventutc = self.eventutc - self.dutc
+                        self.eventutc = self.eventutc - self.datetime_delay
+                        self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+
+                        # deal with circular buffer in centering output event:
+                        self.select_event()
+                    
+                        self.ecount = self.ecount + 1   # keep event count
+                        print 'Event: ', self.ecount
+                        print 'Utc event: ', self.eventutc
+                        print 'Utc MJD  : ', self.eventmjd
+                        print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
+                        print 'N in : ', ns, '; Nout: ',nout
+                        self.init_buffer()      # start again
+
+            # end for all input samples
+            # end if buffer already full
+        else:  # this is the start of the other major (un-usual) mode
+            # buffer is not full, fill samples in buffer
+            for j in range(ns):
                 
             # record the new values (maybe on top of previous
-            self.values[self.next] = inn[j]
-            self.value2s[self.next] = mag2s[j]
-            self.rmssum2 = self.rmssum2 + mag2s[j]
+                self.values[self.next] = inn[j]
+                self.value2s[self.next] = mag[j]
+                self.rmssum2 = self.rmssum2 + self.value2s[self.next]
 
-            # now handle circular buffer and detect full buffer
-            self.next = self.next + 1
-            # determine when buffer is full.
-            # Always output an event each time the buffer cycles
-            # end cycling around the buffer
-            if self.next >= self.vlen:
-                self.full = True
-                self.next = 0
-                # only work with squares until event is found
-                self.rms2 = self.rmssum2*self.oneovern
-                # set threshold for the next block of samples
-                self.nsigmarms2 = self.nsigma2 * self.rms2
-                
-                # if no events yet or monitoring, output latest vector
-                if self.ecount <= 0 or self.mode <= EVENT_MONITOR: 
-                    self.vevent = copy.deepcopy(self.values)
-                    self.emagnitude = np.sqrt(max( self.value2s))
-                    self.erms = np.sqrt(self.rms2)
-                    self.eventutc = datetime.datetime.utcnow() - self.dutc
-                    self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
-
-                outa[nout] = self.vevent  # ouput vector of samples
-                outb[nout] = self.emagnitude
-                outc[nout] = self.erms
-                outd[nout] = self.eventmjd
-                nout = nout + 1
-
-            # once vector is full, next2 is the place to look for the last event
-            self.next2 = self.next2 + 1
-            if self.next2 >= self.vlen:
-                self.next2 = 0
-
-            # only start detecting events if the buffer is full
-            if self.full:
-                # finally if full buffer and event found
-                if self.value2s[self.next2] > self.nsigmarms2:
-                    # an event is found!
-                    self.emagnitude = np.sqrt(self.value2s[self.next2])
-                    self.erms = np.sqrt(self.rms2)
-                    self.eventutc = datetime.datetime.utcnow()
-                    # offset now for middle of event
-                    self.eventutc = self.eventutc - self.dutc
-                    self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
-
-                    # deal with circular buffer in centering output event:
-#                    self.order_event()
-                    self.select_event()
+                # now handle circular buffer and detect full buffer
+                self.next = self.next + 1
+                # determine when buffer is full.
+                # Always output an event each time the buffer cycles
+                # end cycling around the buffer
+                if self.next >= self.vlen:
+                    self.full = True
+                    self.next = 0
+                    # only work with squares until event is found
+                    self.rms2 = self.rmssum2*self.oneovern
+                    # set threshold for the next block of samples
+                    self.nsigmarms2 = self.nsigma2 * self.rms2
+                    self.rmssum2 = 0.  # start new sum
                     
-                    self.ecount = self.ecount + 1   # keep event count
-                    print 'Event: ', self.ecount
-                    print 'Utc event: ', self.eventutc
-                    print 'Utc MJD  : ', self.eventmjd
-                    print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
-                    self.init_buffer()      # start again
-
+                    # if monitoring, output latest vector
+                    if self.mode <= EVENT_MONITOR or self.ecount < 1: 
+                        self.vevent = copy.deepcopy(self.values)
+                        self.emagnitude = np.sqrt(max( self.value2s))
+                        self.erms = np.sqrt(self.rms2)
+                        self.eventutc = datetime.datetime.utcnow() - self.dutc
+                        self.eventutc = self.eventutc - self.datetime_delay
+                        self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+                        self.ecount = 1
+                        
+                    outa[nout] = self.vevent  # ouput vector of samples
+                    outb[nout] = self.emagnitude
+                    outc[nout] = self.erms
+                    outd[nout] = self.eventmjd
+                    nout = nout + 1
+                # check whether we've waited enough for buffer to fill again
+                if self.waitcount <= 0:
+                    self.full = True
+                else:
+                    self.waitcount = self.waitcount - 1
+                    
+                # next2 is the place to look for the last event
+                self.next2 = self.next2 + 1
+                if self.next2 >= self.vlen:
+                    self.next2 = 0
+        # end for all samples
+    # end else if not full
+    
         if nout > 0:   # if received enough samples to fill a buffer
             output_items[0] = outa   # return the event vectors
             output_items[1] = outb   # return the magnitudes
             output_items[2] = outc   # return the RMSs
             output_items[3] = outd   # return event MJDs
-        # end for all input samples
         
         return nout
     # end ra_event work()

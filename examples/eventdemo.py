@@ -5,7 +5,7 @@
 # Title: Event Detection Demo
 # Author: Glen Langston
 # Description: This demo tests the event detection block
-# Generated: Mon Jan 14 10:44:00 2019
+# Generated: Tue Jan 15 11:40:13 2019
 ##################################################
 
 if __name__ == '__main__':
@@ -87,7 +87,7 @@ class eventdemo(gr.top_block, Qt.QWidget):
         self._mode_combo_box.currentIndexChanged.connect(
         	lambda i: self.set_mode(self._mode_options[i]))
         self.top_grid_layout.addWidget(self._mode_tool_bar, 0,0,1,1)
-        self.ra_vevent_0 = ra_vevent.ra_vevent(fftsize, mode, nsigma, samp_rate)
+        self.ra_vevent_0 = ra_vevent.ra_vevent(fftsize, mode, nsigma, samp_rate, 3./samp_rate)
         self.qtgui_time_sink_x_0_0 = qtgui.time_sink_c(
         	fftsize, #size
         	samp_rate, #samp_rate
@@ -188,13 +188,44 @@ class eventdemo(gr.top_block, Qt.QWidget):
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.pyqwidget(), Qt.QWidget)
         self.top_grid_layout.addWidget(self._qtgui_time_sink_x_0_win, 8,0,5,5)
+        self.qtgui_number_sink_0_0 = qtgui.number_sink(
+            gr.sizeof_float,
+            0,
+            qtgui.NUM_GRAPH_NONE,
+            1
+        )
+        self.qtgui_number_sink_0_0.set_update_time(1)
+        self.qtgui_number_sink_0_0.set_title("")
+
+        labels = ['Event Mjd', 'RMS', 'Event Mjd', '', '',
+                  '', '', '', '', '']
+        units = ['', '', '', '', '',
+                 '', '', '', '', '']
+        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
+                  ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
+        factor = [1, 1, 1, 1, 1,
+                  1, 1, 1, 1, 1]
+        for i in xrange(1):
+            self.qtgui_number_sink_0_0.set_min(i, -1)
+            self.qtgui_number_sink_0_0.set_max(i, 1)
+            self.qtgui_number_sink_0_0.set_color(i, colors[i][0], colors[i][1])
+            if len(labels[i]) == 0:
+                self.qtgui_number_sink_0_0.set_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_number_sink_0_0.set_label(i, labels[i])
+            self.qtgui_number_sink_0_0.set_unit(i, units[i])
+            self.qtgui_number_sink_0_0.set_factor(i, factor[i])
+
+        self.qtgui_number_sink_0_0.enable_autoscale(False)
+        self._qtgui_number_sink_0_0_win = sip.wrapinstance(self.qtgui_number_sink_0_0.pyqwidget(), Qt.QWidget)
+        self.top_grid_layout.addWidget(self._qtgui_number_sink_0_0_win, 0,3,1,1)
         self.qtgui_number_sink_0 = qtgui.number_sink(
             gr.sizeof_float,
             0,
             qtgui.NUM_GRAPH_NONE,
-            3
+            2
         )
-        self.qtgui_number_sink_0.set_update_time(0.25)
+        self.qtgui_number_sink_0.set_update_time(1)
         self.qtgui_number_sink_0.set_title("")
 
         labels = ['Magnitude', 'RMS', 'Event Mjd', '', '',
@@ -205,7 +236,7 @@ class eventdemo(gr.top_block, Qt.QWidget):
                   ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
         factor = [1, 1, 1, 1, 1,
                   1, 1, 1, 1, 1]
-        for i in xrange(3):
+        for i in xrange(2):
             self.qtgui_number_sink_0.set_min(i, -1)
             self.qtgui_number_sink_0.set_max(i, 1)
             self.qtgui_number_sink_0.set_color(i, colors[i][0], colors[i][1])
@@ -221,7 +252,9 @@ class eventdemo(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._qtgui_number_sink_0_win)
         self.blocks_vector_to_stream_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, fftsize)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
+        self.blocks_delay_1 = blocks.delay(gr.sizeof_gr_complex*1, 1)
         self.blocks_delay_0 = blocks.delay(gr.sizeof_gr_complex*1, fftsize)
+        self.blocks_complex_to_mag_squared_0 = blocks.complex_to_mag_squared(1)
         self.blocks_add_xx_0 = blocks.add_vcc(1)
         self.analog_sig_source_x_0_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, 2e5, .05, 0)
         self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, 3e5, .1, 0)
@@ -234,14 +267,17 @@ class eventdemo(gr.top_block, Qt.QWidget):
         self.connect((self.analog_sig_source_x_0, 0), (self.blocks_add_xx_0, 0))
         self.connect((self.analog_sig_source_x_0_0, 0), (self.blocks_add_xx_0, 1))
         self.connect((self.blocks_add_xx_0, 0), (self.blocks_throttle_0, 0))
+        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.ra_vevent_0, 1))
         self.connect((self.blocks_delay_0, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_delay_1, 0), (self.ra_vevent_0, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.blocks_complex_to_mag_squared_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.blocks_delay_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.ra_vevent_0, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.blocks_delay_1, 0))
         self.connect((self.blocks_vector_to_stream_0, 0), (self.qtgui_time_sink_x_0_0, 0))
         self.connect((self.ra_vevent_0, 0), (self.blocks_vector_to_stream_0, 0))
-        self.connect((self.ra_vevent_0, 3), (self.qtgui_number_sink_0, 2))
         self.connect((self.ra_vevent_0, 1), (self.qtgui_number_sink_0, 0))
         self.connect((self.ra_vevent_0, 2), (self.qtgui_number_sink_0, 1))
+        self.connect((self.ra_vevent_0, 3), (self.qtgui_number_sink_0_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "eventdemo")
@@ -254,6 +290,7 @@ class eventdemo(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.ra_vevent_0.set_sample_rate( self.samp_rate)
+        self.ra_vevent_0.set_sample_delay( 3./self.samp_rate)
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.blocks_throttle_0.set_sample_rate(self.samp_rate)

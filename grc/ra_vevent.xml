@@ -4,11 +4,12 @@
   <key>ra_vevent</key>
   <category>[ra]</category>
   <import>import ra_vevent</import>
-  <make>ra_vevent.ra_vevent($vlen, $mode, $nsigma, $sample_rate)</make>
+  <make>ra_vevent.ra_vevent($vlen, $mode, $nsigma, $sample_rate, $sample_delay)</make>
   <callback>set_vlen( $vlen)</callback>
   <callback>set_mode( $mode)</callback>
   <callback>set_nsigma( $nsigma)</callback>
   <callback>set_sample_rate( $sample_rate)</callback>
+  <callback>set_sample_delay( $sample_delay)</callback>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -17,7 +18,7 @@
   <param>
     <name>Mode</name>
     <key>mode</key>
-    <value>1</value>
+    <value>2</value>
     <type>int</type>
   </param>
   <param>
@@ -29,7 +30,13 @@
   <param>
     <name>Sample Rate (Hz)</name>
     <key>sample_rate</key>
-    <value>3.E6</value>
+    <value>1.E6</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Sample Delay (sec)</name>
+    <key>sample_delay</key>
+    <value>0.0001</value>
     <type>float</type>
   </param>
   <param>
@@ -46,6 +53,10 @@
   <sink>
     <name>in</name>
     <type>complex</type>
+  </sink>
+  <sink>
+    <name>mag2</name>
+    <type>float</type>
   </sink>
   <!-- Make one 'source' node per output. Sub-nodes:
        * name (an identifier for the GUI)
