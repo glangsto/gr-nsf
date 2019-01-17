@@ -1,42 +1,35 @@
 <?xml version="1.0"?>
 <block>
-  <name>Vevent</name>
-  <key>ra_vevent</key>
+  <name>Event Sink</name>
+  <key>ra_event_sink</key>
   <category>[ra]</category>
-  <import>import ra_vevent</import>
-  <make>ra_vevent.ra_vevent($vlen, $mode, $nsigma, $sample_rate, $sample_delay)</make>
+  <import>import ra_event_sink</import>
+  <make>ra_event_sink.ra_event_sink($setup, $vlen, $sample_rate, $record)</make>
+  <callback>set_setup( $setup)</callback>
   <callback>set_vlen( $vlen)</callback>
-  <callback>set_mode( $mode)</callback>
-  <callback>set_nsigma( $nsigma)</callback>
   <callback>set_sample_rate( $sample_rate)</callback>
-  <callback>set_sample_delay( $sample_delay)</callback>
+  <callback>set_record( $record)</callback>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
-  <param>
-    <name>Mode</name>
-    <key>mode</key>
-    <value>2</value>
-    <type>int</type>
+    <param>
+    <name>Setup File</name>
+    <key>setup</key>
+    <value>Watch.not</value>
+    <type>string</type>
   </param>
-  <param>
-    <name>N sigma</name>
-    <key>nsigma</key>
-    <value>10.</value>
-    <type>float</type>
+<param>
+    <name>Record</name>
+    <key>record</key>
+    <value>0</value>
+    <type>int</type>
   </param>
   <param>
     <name>Sample Rate (Hz)</name>
     <key>sample_rate</key>
     <value>1.E6</value>
-    <type>float</type>
-  </param>
-  <param>
-    <name>Sample Delay (sec)</name>
-    <key>sample_delay</key>
-    <value>0.0001</value>
     <type>float</type>
   </param>
   <param>
@@ -53,10 +46,22 @@
   <sink>
     <name>in</name>
     <type>complex</type>
+    <vlen>$vlen</vlen>
   </sink>
   <sink>
-    <name>mag2</name>
+    <name>magnitude</name>
     <type>float</type>
+    <vlen>1</vlen>
+  </sink>
+  <sink>
+    <name>stddev</name>
+    <type>float</type>
+    <vlen>1</vlen>
+  </sink>
+  <sink>
+    <name>eventmjd</name>
+    <type>complex</type>
+    <vlen>1</vlen>
   </sink>
   <!-- Make one 'source' node per output. Sub-nodes:
        * name (an identifier for the GUI)
@@ -64,23 +69,8 @@
        * vlen
        * optional (set to 1 for optional inputs) -->
   <source>
-    <name>out</name>
-    <type>complex</type>
-    <vlen>$vlen</vlen>
-  </source>
-  <source>
-    <name>magnitude</name>
+    <name>ecount</name>
     <type>float</type>
-    <vlen>1</vlen>
-  </source>
-  <source>
-    <name>stddev</name>
-    <type>float</type>
-    <vlen>1</vlen>
-  </source>
-  <source>
-    <name>eventmjd</name>
-    <type>complex</type>
     <vlen>1</vlen>
   </source>
 </block>

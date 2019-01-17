@@ -2,6 +2,7 @@
 Class defining a Radio Frequency Spectrum
 Includes reading and writing ascii files
 HISTORY
+19JAN16 GIL add Event Reading and Writing
 18MAY20 GIL code cleanup
 18APR18 GIL add NAVE to save complete obsevering setup
 18MAR10 GIL add labels for different integration types
@@ -17,7 +18,9 @@ HISTORY
 ##################################################
 import datetime
 import copy
-import numpy
+import numpy as np
+import angles
+
 try:
     import ephem
 except ImportError:
@@ -28,8 +31,6 @@ except ImportError:
     print '       sudo pip install pyephem'
     print ''
     exit()
-
-import angles
 
 MAXCHAN = 1024
 OBSSURVEY = 0
@@ -57,7 +58,7 @@ unitlabels = ['Counts', 'Power (dB)', 'Kelvin', 'Jansky']
 ### average two utcs using the strange steps required by datetime
 def aveutcs(utc1, utc2):
     """
-    Ave Utcs takes as input two utc time and returns the average of these utcs
+    Ave Utcs takes as input two utc times and returns the average of these utcs
     Input and output 1st output are in datetime format.  The second output
     is the time interval between start and stop in seconds
     Glen Langston, 2018 April 20
@@ -193,7 +194,7 @@ def time2float(instring, hint):
 class Spectrum(object):
     """
     Define a Radio Spectrum class for processing, reading and
-    writing astronomical data.
+    writing astronomical data.   Also used for Events
     """
     def __init__(self):
         """
@@ -207,9 +208,9 @@ class Spectrum(object):
         telType = "Pyramid Horn"
         refChan = MAXCHAN/2
         observer = "Glen Langston"
-        xdata = numpy.zeros(MAXCHAN)
-        ydataA = numpy.zeros(MAXCHAN)
-        ydataB = numpy.zeros(MAXCHAN)
+        xdata = np.zeros(MAXCHAN)
+        ydataA = np.zeros(MAXCHAN)
+        ydataB = np.zeros(MAXCHAN)
         #now fill out the spectrum structure.
         self.writecount = 0
         self.count = int(0)          # count of spectra summed
@@ -246,6 +247,7 @@ class Spectrum(object):
         self.etaB = .99 # efficiency main beam (range 0 to 1)
         self.bunit = 'Counts'       # brightness units
         self.refChan = refChan
+        self.refSample = 0          # identify reference sample in event stream
         self.version = str("2.0.1")
         self.polA = str("X")        # polariation of A ydata: X, Y, R, L,
         self.polB = str("Y")        # polariation of B ydata: X, Y, R, L,
@@ -268,6 +270,18 @@ class Spectrum(object):
         self.ydataB = ydataB
         self.nChan = len(ydataA)
         self.nSpec = 1
+# finally the spectrum data
+        self.deltaFreq = 1.0   # frequency interval between channels
+        self.xdata = xdata
+        self.ydataA = ydataA
+        self.ydataB = ydataB
+        self.nChan = len(ydataA)
+        self.nSpec = 1
+# or the event; will reset nTime and nSamples to match event size
+        self.nTime = 0
+        samples = np.zeros(2, dtype=np.complex64)
+        self.nSamples = len(samples)
+        self.samples = samples
 
     def __str__(self):
         """
@@ -280,7 +294,7 @@ class Spectrum(object):
         """
         Compute the ra,dec (J2000) from Az,El location and time
         """
-        rads = numpy.pi / 180.
+        rads = np.pi / 180.
         radec2000 = ephem.Equatorial(rads*self.ra, rads*self.dec, epoch=ephem.J2000)
         # to convert to dec degrees need to replace on : with d
         self.epoch = "2000"
@@ -310,7 +324,7 @@ class Spectrum(object):
         ## Must set the date before calculating ra, dec!!!
         # compute apparent RA,DEC for date of observations
         ra_a, dec_a = location.radec_of(str(self.telaz), str(self.telel))
-        fmt = 'Date   = %s,  LST = %s, %f (%f, %f)'
+#        fmt = 'Date   = %s,  LST = %s, %f (%f, %f)'
 #        print fmt % (datestr, lst, self.lst, self.telaz, self.telel)
         radec = ephem.Equatorial(ra_a, dec_a, epoch=datestr)
 #        print 'Ra,Dec %s,%s for %s' % (radec.ra, radec.dec, radec.epoch)
@@ -426,6 +440,13 @@ class Spectrum(object):
         nSpec = self.nSpec
         outline = '# NSPEC     = '  + str(nSpec) + '\n'
         outfile.write(outline)
+        nSamples = self.nSamples
+        outline = '# NSAMPLES  = '  + str(nSamples) + '\n'
+        outfile.write(outline)
+        outline = '# REFCHAN   = '  + str(self.refChan) + '\n'
+        outfile.write(outline)
+        outline = '# REFSAMPL  = '  + str(self.refSample) + '\n'
+        outfile.write(outline)
         nave = self.nave
         outline = '# NAVE      = '  + str(nave) + '\n'
         outfile.write(outline)
@@ -483,15 +504,29 @@ class Spectrum(object):
         outline = '# AST_VERS  = '  + str("04.02") + '\n'
         outfile.write(outline)
 
-        dx = self.bandwidthHz/float(self.nChan)
-        x = self.centerFreqHz - (self.bandwidthHz/2.) + (dx/2.)
-        yv = self.ydataA
-        leny = len(yv)
-        for i in range(min(self.nChan, leny)):
-            outline = str(i).zfill(4) + ' ' + str(long(x)) + ' ' + str(yv[i]) + '\n'
-            outfile.write(outline)
-            x = x + dx
-        del outline
+        # if a spectrum in this data stream
+        if self.nSpec > 0:
+            dx = self.bandwidthHz/float(self.nChan)
+            x = self.centerFreqHz - (self.bandwidthHz/2.) + (dx/2.)
+            yv = self.ydataA
+            leny = len(yv)
+            for i in range(min(self.nChan, leny)):
+                outline = str(i).zfill(4) + ' ' + str(long(x)) + ' ' + str(yv[i]) + '\n'
+                outfile.write(outline)
+                x = x + dx
+            del outline
+        if self.nTime > 0:
+            outline = "#        dt      I         Q"
+            dt = 1./self.bandwidthHz       # sample rate is inverse bandwidth
+            t = -dt * self.refSample       # time tag relative to event sample
+            yv = self.samples # time samples are I/Q (complex) values
+            leny = len(yv)
+            pformat = "%04d %9.7f %7.5f %7.5f\n"
+            for i in range(min(self.nSamples, leny)):
+                outline = pformat % (i, t, yv[i].real, yv[i].imag)
+                outfile.write(outline)
+                t = t + dt
+            del outline
         outfile.close()
 
     def write_ascii_ast(self, dirname):
@@ -505,16 +540,21 @@ class Spectrum(object):
         daypart = datestr[0]
         yymmdd = daypart[2:19]
         # distinguish hot load and regular observations
-        if self.telel > 0:
-            outname = yymmdd + '.ast'
-        else:
-            outname = yymmdd + '.hot'
+        if self.nSpec <= 0:               # if not a spectrum
+            outname = yymmdd + '.eve'     # must be an event
+            self.nTime = 1
+        else:                             # else a spectrum
+            if self.telel > 0:
+                outname = yymmdd + '.ast'
+            else:
+                outname = yymmdd + '.hot'
         outname = outname.replace(":", "")
         self.write_ascii_file(dirname, outname)
 
     def read_spec_ast(self, fullname):
         """
-        Read an ascii radio Spectrum file and return a radioSpectrum object
+        Read an ascii radio Spectrum file or an event in radio samples and
+        fill a Spectrum object
         """
         # turn on/off printing
         verbose = True
@@ -583,17 +623,19 @@ class Spectrum(object):
                     self.nChan = int(parts[3])
                 if parts[1] == 'BUNIT':
                     otherparts = line.split('=')
-                    self.bunit = str( otherparts[1]).strip()
+                    self.bunit = str(otherparts[1]).strip()
                     if verbose:
                         print 'Bunit    ', self.bunit
                 if parts[1] == 'NSPEC':
                     self.nSpec = int(parts[3])
                 if parts[1] == 'NAVE':
-                    self.nave  = int(parts[3])
+                    self.nave = int(parts[3])
                 if parts[1] == 'NMEDIAN':
                     self.nmedian = int(parts[3])
                 if parts[1] == 'REFCHAN':
                     self.refChan = float(parts[3])
+                if parts[1] == 'REFSAMPL':
+                    self.refSample = float(parts[3])
                 if parts[1] == 'FFT_RATE':
                     self.fft_rate = int(parts[3])
                     if self.fft_rate < 1:
@@ -616,7 +658,7 @@ class Spectrum(object):
                     if verbose:
                         print 'read: parts: ', parts
                         print 'read: gains: ', gains
-                    self.gains = numpy.array(gains)
+                    self.gains = np.array(gains)
                     # get one or more gains separated by ';'
                 if parts[1] == 'LNA=' or parts[1] == 'GAINS=':
                     gains = []
@@ -626,7 +668,7 @@ class Spectrum(object):
                         moreparts = gainstr.split()
                         for kkk in moreparts:
                             gains.append(float(kkk))
-                    self.gains = numpy.array(gains)
+                    self.gains = np.array(gains)
                 apart = parts[1]
                 if apart[0:3] == 'GAIN':
                     i = int(apart[4])
@@ -660,6 +702,7 @@ class Spectrum(object):
                 if parts[1] == 'SITE':
                     otherparts = line.split('=')
                     self.site = str(otherparts[1]).strip()
+                    self.noteA = self.site # site is new note in interface
                     if verbose:
                         print 'Site    : ', self.site
                 if parts[1] == 'CITY':
@@ -742,39 +785,64 @@ class Spectrum(object):
 # start data processing
             datacount = datacount+1
             p = line.split()
-            np = len(p)
-            if np < 3:
+            nparts = len(p)
+            if nparts < 3:
                 continue
-            try:
-                x1.append(float(p[1]))
-            except:
-                x1.append(0.0)
-            try:
-                y1.append(float(p[2]))
-            except:
-                y1.append(0.0)
-            if self.nSpec > 1:
+            if self.nSpec > 0:  # if there are spectra in the file
+                try:
+                    x1.append(float(p[1]))
+                except:
+                    x1.append(0.0)
+                try:
+                    y1.append(float(p[2]))
+                except:
+                    y1.append(0.0)
+                if self.nSpec > 1:
+                    try:
+                        y2.append(float(p[3]))
+                    except:
+                        y2.append(0.0)
+
+            #else this file contains an event                
+            if self.nTime > 0:
+                # event time format: index, dt, I, Q
+                # p[0] is index, which is skipped in processing
+                try:
+                    x1.append(float(p[1]))
+                except:
+                    x1.append(0.0)
+                try:
+                    y1.append(float(p[2]))
+                except:
+                    y1.append(0.0)
                 try:
                     y2.append(float(p[3]))
                 except:
                     y2.append(0.0)
 
-# at this point all data and header keywords are read
-        self.xdata = numpy.array(x1)  # transfer
-        self.ydataA = numpy.array(y1) # always transfer 1 spectrum
-        if self.nSpec > 1:            # if more than one spectrum
-            self.ydataB = numpy.array(y2)   # transfer it too
-            
-        ndata = len(self.xdata)
-        if self.nChan != ndata:
-            print "File header Miss-match and number of channels in data"
-            print ": %f != %f" % (self.nChan, ndata)
-            self.nChan = int(ndata)
-        return
+        # at this point all data and header keywords are read
+        self.xdata = np.array(x1)       # transfer x axis; channels or time
+        if self.nSpec > 0:
+            self.ydataA = np.array(y1)       # always transfer 1 spectrum
+            if self.nSpec > 1:               # if more than one spectrum
+                self.ydataB = np.array(y2)   # transfer it too
+
+            ndata = len(self.xdata)
+            if self.nChan != ndata:
+                print "File header Miss-match and number of channels in data"
+                print ": %f != %f" % (self.nChan, ndata)
+                self.nChan = int(ndata)
+        if self.nTime > 0:
+            yreal = np.array(y1)       # transfer I samples
+            yimag = np.array(y2)       # transfer Q samples
+            self.samples = yreal + yimag*1j
+            self.nSamples = len(self.xdata)                
+        return #end of read_spec_ascii
 
     def foldfrequency(self):
         """
         foldfrequency flips and averages the folded xaxis
+        This function was only used while there was a problem with data taking
         """
         yfold = self.ydataA[::-1]
 #        print len(yfold)

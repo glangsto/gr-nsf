@@ -23,60 +23,45 @@ import numpy as np
 from gnuradio import gr
 import radioastronomy
 
+try:
+    import jdutil
+except:
+    print "jdutil is needed to compute Modified Julian Days"
+    print "try:"
+    print "git clone https://github.com/jiffyclub/jdutil.py"
+    print ""
+    print "Good Luck! -- Glen"
+
 class ra_event_sink(gr.sync_block):
     """
     Write Event File.  The input
     1) Time Sequence (vector) of I/Q complex samples
-    2) Event Modified Julian Date floa
+    2) Event Modified Julian Date (complex, for precision)
+    The real and imaginary parts of the MJD sum to the actual MJD.
+    Precision is lost during optimization in gnuradio value transfers.
     Parameters are
-    1) Vector length in Channels
-    2) Frequency (Hz)
+    1) ConfigFileName
+    2) Vector length in Channels
     3) Bandwidth (Hz)
-    4) Telescop Azimuth (d)
-    5) Telescop Elevation (d)
-    6) Record Flag
-    7) Observation Type
+    4) Record Flag
     This block is intended to reduce the downstream CPU load.
     """
-    def __init__(self, noteName, observers, vlen, frequency, bandwidth,
-                 azimuth, elevation, record, obstype, 
-                 nmedian, nave, site, device, gain1, gain2, gain3):
+    def __init__(self, noteName, vlen, bandwidth, record):
         gr.sync_block.__init__(self,
                                name="ra_event_sink",              
-                               in_sig=[(np.float32, int(vlen))], # input is 1 spectrum
-                               out_sig=[np.float32],             # output is time remaining
-        )
+                               # inputs: time sequence of I,Q values,
+                               # peak, rms, Event MJD
+                               in_sig=[(np.complex64, int(vlen)),
+                                       np.float32, np.float32, np.complex64],
+                               out_sig=[np.float32], )
         vlen = int(vlen)
         self.vlen = vlen
-        self.nave = nave
-        self.avecount = 0
-        self.record = radioastronomy.INTWAIT
-        self.sum = np.zeros(vlen)
-        self.noteName = str(noteName)
-        # split out extension name
-        noteParts = self.noteName.split('.')
-        #always use .not extension for notes files
-        self.noteName = noteParts[0]+'.not'
-        if len(noteParts) > 2:
-            print '!!! Warning, unexpected Notes File name! '
-            print '!!! Using file: ',self.noteName
+        self.ecount = 1
+        self.record = int(record)
         self.obs = radioastronomy.Spectrum()
-        self.obs.read_spec_ast(self.noteName)    # read the parameters 
-        self.obs.observer = observers
-        self.obs.nChan = vlen
-        self.obs.nSpec = 1
-        self.obs.ydataA = np.zeros(vlen)
-        self.obs.ydataB = np.zeros(vlen)
-        self.obs.xdata = np.zeros(vlen)
-        now = datetime.datetime.utcnow()
-        self.eventutc = now
-        self.obs.utc = now
-        self.average_done = 0.0  # no data averaged yet
+        self.lastmjd = 0.
         self.setupdir = "./"
-        self.noteName = noteName
-        # split out extension name
-        noteParts = self.noteName.split('.')
-        #always use .not extension for notes files
+        noteParts = noteName.split('.')
         self.noteName = noteParts[0]+'.not'
         if len(noteParts) > 2:
             print '!!! Warning, unexpected Notes File name! '
@@ -91,134 +76,49 @@ class ra_event_sink(gr.sync_block):
                         shutil.copyfile( "Watch.not", self.noteName)
                         print "Created %s from file: Watch.not" % (self.noteName)
                     except:
-                        print "! Create the Note file %s, and try again !" % (self.noteName)
+                        pformat = "! Create the Note file %s, and try again !" 
+                        print pformat % (self.noteName)
+        self.obs.read_spec_ast(self.noteName)    # read the parameters
+        self.obs.datadir = "../events/"          # writing events not spectra
+        self.obs.noteB = "Event Detection"
         if not os.path.exists(self.obs.datadir):
             os.makedirs(self.obs.datadir)
         nd = len(self.obs.datadir)
         if self.obs.datadir[nd-1] != '/':
             self.obs.datadir = self.obs.datadir + "/"
             print 'DataDir          : ', self.obs.datadir
-        print 'Observer Names   : ', self.obs.observer
-        # skip writing notes until the end of init
-        dosave = False
-        self.set_obstype(obstype)
-        self.set_frequency(frequency, dosave)
-        self.set_bandwidth(bandwidth, dosave)
-        self.set_azimuth(azimuth, dosave)
-        self.set_elevation(elevation, dosave)
-        self.set_nmedian(nmedian, dosave)
-        self.set_nave(nave, dosave)
-        self.set_gain1(gain1, dosave)
-        self.set_gain2(gain2, dosave)
-        self.set_gain3(gain3, dosave)
-        self.set_site(site, dosave)
-        self.set_device(device, dosave)
-        self.set_record(record)
-        self.save_setup()
+        self.obs.nSpec = 0             # not working with spectra
+        self.obs.nChan = 0
+        self.obs.nTime = 1             # working with time series
+        self.obs.nSamples = vlen
+        vlen2 = int(vlen/2)
+        self.obs.refSample = vlen2 + 1 # event is in middle of time sequence
+        self.obs.ydataA = np.zeros(vlen, dtype=np.complex64)
+        self.obs.xdata = np.zeros(vlen)
+        now = datetime.datetime.utcnow()
+        self.eventutc = now
+        self.obs.utc = now
+        self.set_sample_rate( bandwidth)
 
     def forecast(self, noutput_items, ninput_items): #forcast is a no op
         """
         The work block always processes all inputs
         """
+        ninput_items = noutput_items
         return ninput_items
 
-    def set_frequency(self, frequency, dosave=True):
-        self.obs.centerFreqHz = np.float(frequency)
-        deltaNu = self.obs.bandwidthHz/np.float(self.vlen)
-        n0 = self.obs.centerFreqHz - (self.obs.bandwidthHz/2.)
-        nu = n0
-        print "Setting Frequency: %10.0f Hz" % (self.obs.centerFreqHz)
-        for iii in range(self.vlen):
-            self.obs.xdata[iii] = nu
-            nu = nu + deltaNu
-        if dosave:
-            self.save_setup()
-
-    def set_bandwidth(self, bandwidth, dosave=True):
-        self.obs.bandwidthHz = np.float(bandwidth)
-        deltaNu = self.obs.bandwidthHz/np.float(self.vlen)
-        n0 = self.obs.centerFreqHz - (self.obs.bandwidthHz/2.)
-        nu = n0
+    def set_sample_rate(self, bandwidth):
+        bandwidth = np.float(bandwidth)
+        if bandwidth == 0:
+            print "Invalid Bandwidth: ", bandwidth
+            return
+        self.obs.bandwidthHz = bandwidth
         print "Setting Bandwidth: %10.0f Hz" % (self.obs.bandwidthHz)
-        self.dt = self.obs.nmedian * self.vlen / self.obs.bandwidthHz
-        self.average_sec = self.dt * self.nave
+        self.obs.dt = 1./np.fabs(self.obs.bandwidthHz)
+        t = -self.obs.dt * self.obs.refSample
         for iii in range(self.vlen):
-            self.obs.xdata[iii] = nu
-            nu = nu + deltaNu
-        if dosave:
-            self.save_setup()
-
-    def set_azimuth(self, azimuth, dosave=True):
-        """
-        Record telescope azimuth for astronomical calculations
-        """
-        self.obs.telaz = np.float(azimuth)
-        print "Setting Azimuth  : %6.1f d" % self.obs.telaz
-        if dosave:
-            self.save_setup()
-                              
-    def set_elevation(self, elevation, dosave=True):
-        """
-        Record telescope elevation for astronmical calculations
-        """
-        self.obs.telel = np.float(elevation)
-        print "Setting Elevation: %6.1f d" % self.obs.telel
-        if dosave:
-            self.save_setup()
-
-    def set_nmedian(self, nmedian, dosave=True):
-        """
-        Set the number of spectra averaged before input to work block
-        """
-        self.obs.nmedian = int(nmedian)
-        self.dt = self.obs.nmedian * self.vlen / self.obs.bandwidthHz
-        self.average_sec = self.dt * self.nave
-        print 'Median N Spectra : %d  (Integration time: %8.3f)' % (self.obs.nmedian, self.average_sec)
-        if dosave:
-            self.save_setup()
-
-    def set_gain1(self, gain1, dosave=True):
-        """
-        Record the SDR gain settings 
-        """
-        self.obs.gain1 = float(gain1)
-        print 'Gain 1           : %7.2f' % (self.obs.gain1)
-        if dosave:
-            self.save_setup()
-
-    def set_gain2(self, gain2, dosave=True):
-        """
-        Record the SDR gain settings 
-        """
-        self.obs.gain2 = float(gain2)
-        print 'Gain 2           : %7.2f' % (self.obs.gain2)
-        if dosave:
-            self.save_setup()
-
-    def set_gain3(self, gain3, dosave=True):
-        """
-        Record the SDR gain settings 
-        """
-        self.obs.gain3 = float(gain3)
-        print 'Gain 3           : %7.2f' % (self.obs.gain3)
-        if dosave:
-            self.save_setup()
-
-    def set_nave(self, nave, dosave=True):
-        self.nave = int(nave)
-        self.obs.nave = self.nave
-        print 'Average N Spectra: %d' % (self.nave)
-        self.dt = self.obs.nmedian * self.vlen / self.obs.bandwidthHz
-        self.average_sec = self.dt * self.nave
-        print 'Average time     : %8.3f s' % (self.average_sec)
-        if dosave:
-            self.save_setup()
-
-    def get_setup(self):
-        """
-        return the name of the files used for setup
-        """
-        return self.noteName
+            self.obs.xdata[iii] = t
+            t = t + self.obs.dt
 
     def set_setup(self, noteName):
         """
@@ -226,69 +126,31 @@ class ra_event_sink(gr.sync_block):
         """
         self.noteName = str(noteName)
         self.obs.read_spec_ast(self.noteName)    # read the parameters 
+        self.obs.datadir = "../events/"          # writing events not spectra
+        self.obs.nSpec = 0             # not working with spectra
+        self.obs.nChan = 0
+        self.obs.nTime = 1             # working with time series
+        self.obs.refSample = vlen/2    # event is in middle of time sequence
+        self.obs.nSamples = vlen
+        self.obs.ydataA = np.zeros(vlen, dtype=np.complex64)
+        self.obs.xdata = np.zeros(vlen)
+        now = datetime.datetime.utcnow()
+        self.eventutc = now
+        self.obs.utc = now
+        self.setupdir = "./"
+        self.set_sample_rate( self.bandwidth)
     
-    def save_setup(self):
-        """
-        The setup files is a full spectrum
-        """
-        self.obs.write_event_file(self.setupdir, self.noteName)
-        
-    def set_obstype(self, obstype):
-        """
-        The observing type is an integer with enumerated values
-        """
-        self.obstype = int(obstype)
-        print "Observation Type : ", radioastronomy.obslabels[self.obstype]
-
-    def set_observers(self, observers, dosave=True):
-        """
-        Set the observer names to give credit for discoveries
-        """
-        self.obs.observer = str(observers)
-        print "Observers : ", self.obs.observer
-        if dosave:
-            self.save_setup()
-
-    def set_site(self, site, dosave=True):
-        """
-        Set the telescope name for this site
-        """
-        self.obs.site = str(site)
-        print "Telescope : ", self.obs.site
-        if dosave:
-            self.save_setup()
-
-    def set_device(self, device, dosave=True):
-        """
-        The device string sets up the SDR for the observations
-        """
-        self.obs.device = str(device)
-        print "Device    : ", self.obs.device
-        if dosave:
-            self.save_setup()
-
     def set_record(self, record):
         """ 
-        When chaning record status, need to update counters
+        When changing record status, need to update counters
         """
-        # restart the average loop
-        self.avenmedian = 0
-        self.obs.writenmedian = 0
-        now = datetime.datetime.utcnow()
-        # report when the state changed
-        strnow = now.isoformat()
-        parts = strnow.split('.')
-        strnow = parts[0]
         if record == radioastronomy.INTWAIT: 
-            print "Stop  Recording  : ", strnow
-            self.eventutc = now
+            print "Stop  Recording  : "
             self.obs.writecount = 0
+            self.ecount = 1
         # if changing state from recording to not recording
         elif self.record == radioastronomy.INTWAIT and record != radioastronomy.INTWAIT:
-            print "Start Recording  : ", strnow
-            self.eventutc = now
-            # reset the inner averaging loop to restart
-            self.avecount = 0
+            print "Start Recording  : "
         self.record = int(record)
 
     def get_record(self):
@@ -297,24 +159,6 @@ class ra_event_sink(gr.sync_block):
         """
         return self.record
 
-    def get_obstype(self):
-        """
-        return the observing type (Survey, hot, cold, ref)
-        """
-        return self.obstype
-
-    def get_average_sec(self):
-        """
-        return the total predicted averaging time (seconds)
-        """
-        return self.average_sec
-
-    def get_average_left(self):
-        """
-        return the total time remaining is expected minus total (seconds)
-        """
-        return (self.average_sec - self.average_done)
-
     def work(self, input_items, output_items):
         """
         Work averages all input vectors and outputs one vector for each N inputs
@@ -322,107 +166,64 @@ class ra_event_sink(gr.sync_block):
         inn = input_items[0]    # vectors of I/Q (complex) samples
         peak = input_items[1]   # peak magnitudes of events
         rms  = input_items[2]   # rmss of samples near events
-        mjd  = input_items[3]   # Modified Julian Dates of events
+        mjd  = input_items[3]   # Modified Julian Dates of events (complex)
         
         # get the number of input vectors
         nv = len(inn)           # number of events in this port
         samples = inn[0]        # first input vector
-        li = len(samples)          # length of first input vector
-        ncp = min(li, self.vlen)  # don't copy more required (not used)
+        li = len(samples)       # length of first input vector
         t = 0
 
-        if li != self.vlen:
-            print 'spectrum length changed! %d => %d' % (self.vlen, li)
-            self.vlen = li
-            self.obs.xdata = np.zeros(li)
-            self.obs.ydataA = np.zeros(li)
-            self.obs.ydataB = np.zeros(li)
-            self.set_frequency(self.obs.centerfrequencyHz)
-            self.set_bandwidth(self.obs.bandwidthHz)
-            return 1
-
-        noutports = len(output_items)
-        if noutports != 1:
-            print '!!!!!!! Unexpected number of output ports: ', noutports
-        out = output_items[0]  # all vectors in PORT 0
-
+#        noutports = len(output_items)
+#        if noutports != 1:
+#            print '!!!!!!! Unexpected number of output ports: ', noutports
+        counts = output_items[0]  # all vectors in PORT 0
+        nout = 0
+            
         iout = 0 # count the number of output vectors
         for i in range(nv):
             # get the length of one input
             samples = inn[i]
-            # if just starting a sum
-            if self.avecount == 0:
-                self.sum = samples
-                self.average_done = self.dt
-            else:
-                # else add to sum
-                self.average_done = self.average_done + self.dt
-                self.sum = self.sum + samples
-#            print 'Done: ', self.average_done
-            self.avecount = self.avecount + 1
-            # if still averaging, continue
-            if self.avecount < self.nave:
-                continue
-            # else average is complete
-            now = datetime.datetime.utcnow()
-            self.stoputc = now
-            middle, duration = radioastronomy.aveutcs(self.eventutc, self.stoputc)
-            self.obs.utc = middle
-            self.obs.durationSec = duration
-            tsamples = self.obs.nmedian * self.nave * float(self.obs.nChan) / self.obs.bandwidthHz
-            # this removes component due non-gain part of spectrum
-            self.obs.ydataA[0:ncp] = self.sum[0:ncp]
-            self.obs.azel2radec()
-            strnow = middle.isoformat()
-            datestr = strnow.split('.')
-            daypart = datestr[0]
-            yymmdd = daypart[2:19]
-            if self.record != radioastronomy.INTWAIT: 
-                print 'Record Duration  : %7.2fs (Expected %7.2fs)' % (duration, tsamples)
-                if duration < .8 * tsamples:
-                    print 'Duration too short, not saving'
-                    self.eventutc = now
-                    self.avecount = 0
-                    continue
-                # distinguish hot load and regular observations
-                if self.obstype == radioastronomy.OBSREF:
-                    outname = yymmdd + '.ref'
-                else:
-                    if self.obs.telel > 0:
-                        outname = yymmdd + '.ast'
-                    else:
-                        outname = yymmdd + '.hot'
-                #remove : from time
-                outname = outname.replace(":", "")
-                
-                self.obs.writecount = self.obs.writecount + 1
-                # need to keep track of total number of spectra averaged
-                tempcount = self.obs.count
-                self.obs.count = self.obs.count * self.nave
-                self.obs.write_event_file( self.obs.datadir, outname)
-                print('\a')  # ring the terminal bell
-                # must restore the count for possible changes in nave
-                self.obs.count = tempcount
-            else:
-                # else not recording, plenty of time to compute data statistics
-                n6 = int(ncp/6)
-                n56 = 5*n6
-                vmin = min ( samples[n6:n56])
-                vmax = max ( samples[n6:n56])
-                vmed = np.median( samples[n6:n56])
-                print "%s:  Max %9.3f Min: %9.3f Median: %9.3f      " % (yymmdd, vmax, vmin, vmed)
-                # move backwards to replace previous message
-                sys.stdout.write("\033[F")
-                self.obs.writecount = 0 
-            # if here data written, restart sum
-            self.avecount = 0
-
-        out[:] = self.average_sec - self.average_done
-        iout = iout+1
-        
-        # end for all input vectors
-        if (nv != iout):
-            print 'Accumulation error:  ', nv, iout
+            peaks = peak[i]
+            rmss = rms[i]
+            # if same mjd as last time
+            # on ra_event side days is truncated to 10ths of days 
+            days = np.round(mjd[i].real * 10.)
+            fdays = np.float(days)/10.
+            hours = mjd[i].imag  # rest of days is in the hours part
+            eventmjd = fdays + hours
+            if eventmjd > self.lastmjd:
+                self.lastmjd = eventmjd
+                self.obs.samples = samples
+                self.obs.nSamples = len(samples)
+                utc = jdutil.mjd_to_datetime( eventmjd)
+                self.obs.utc = utc
+                # create file name from event time
+                strnow = utc.isoformat()
+                datestr = strnow.split('.')
+                daypart = datestr[0]
+                yymmdd = daypart[2:19]
+                peak 
+                print 'Sink Event: ', self.ecount
+                print 'Sink Utc : ', self.obs.utc
+                print 'Sink MJD : %12.6f' % (eventmjd)
+#                print 'Sink days: %12.6f + %12.6f ' % (fdays, hours)
+                print 'Sink Magnitude: ', peaks, ' +/- ', rmss
+                if self.record == radioastronomy.INTRECORD:
+                    #remove : from time
+                    yymmdd = yymmdd.replace(":", "")
+                    outname = yymmdd + '.eve'   # tag as an event
+                    self.obs.writecount = self.obs.writecount + 1
+                    # need to keep track of total number of spectra averaged
+                    tempcount = self.obs.count
+                    self.obs.write_ascii_file( self.obs.datadir, outname)
+                    print('\a')  # ring the terminal bell
+                self.ecount = self.ecount + 1
+            # output latest event count
+            counts[iout] = np.float(self.ecount)
+            iout = iout+1
+        if iout > 0:
+            output_items[0] = counts
         return iout
     # end event_sink()
 

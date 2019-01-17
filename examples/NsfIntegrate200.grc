@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.9'?>
+<?grc format='1' created='3.7.11'?>
 <flow_graph>
   <timestamp>Sun Mar 11 16:57:49 2018</timestamp>
   <block>
@@ -265,7 +265,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1112, 29)</value>
+      <value>(1110, 11)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -589,7 +589,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1152, 117)</value>
+      <value>(1142, 99)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -636,7 +636,7 @@
     </param>
     <param>
       <key>label0</key>
-      <value>Wait</value>
+      <value>! ! Wait ! !</value>
     </param>
     <param>
       <key>label1</key>
@@ -1038,7 +1038,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>1024</value>
+      <value>2048</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -1218,7 +1218,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 125)</value>
+      <value>(1142, 179)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1438,7 +1438,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(760, 418)</value>
+      <value>(735, 363)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1809,7 +1809,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(16, 108)</value>
+      <value>(0, 107)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1864,7 +1864,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(944, 187)</value>
+      <value>(918, 171)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2038,7 +2038,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(400, 9)</value>
+      <value>(631, 31)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2081,11 +2081,11 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(776, 108)</value>
+      <value>(583, 259)</value>
     </param>
     <param>
       <key>_rotation</key>
-      <value>0</value>
+      <value>180</value>
     </param>
     <param>
       <key>id</key>
@@ -2124,7 +2124,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(400, 108)</value>
+      <value>(399, 155)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2183,7 +2183,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(560, 80)</value>
+      <value>(607, 123)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2219,49 +2219,10 @@
     </param>
   </block>
   <block>
-    <key>note</key>
+    <key>fir_filter_xxx</key>
     <param>
       <key>alias</key>
       <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 156)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>note_1</value>
-    </param>
-    <param>
-      <key>note</key>
-      <value>The sequence of vector medians removes temporary RFI</value>
-    </param>
-  </block>
-  <block>
-    <key>pluto_source</key>
-    <param>
-      <key>bbdc</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>buffer_size</key>
-      <value>0x80000</value>
     </param>
     <param>
       <key>comment</key>
@@ -2272,7 +2233,66 @@
       <value></value>
     </param>
     <param>
-      <key>uri</key>
+      <key>decim</key>
+      <value>128</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(399, 35)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>fir_filter_xxx_0</value>
+    </param>
+    <param>
+      <key>maxoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>minoutbuf</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>samp_delay</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>taps</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>ccf</value>
+    </param>
+  </block>
+  <block>
+    <key>iio_fmcomms2_source</key>
+    <param>
+      <key>bbdc</key>
+      <value>False</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>buffer_size</key>
+      <value>32767</value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
       <value></value>
     </param>
     <param>
@@ -2289,27 +2309,39 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(200, -1)</value>
+      <value>(167, 3)</value>
     </param>
     <param>
       <key>_rotation</key>
       <value>0</value>
     </param>
     <param>
-      <key>gain</key>
+      <key>gain1</key>
+      <value>"manual"</value>
+    </param>
+    <param>
+      <key>gain2</key>
       <value>"manual"</value>
     </param>
     <param>
       <key>id</key>
-      <value>pluto_source_0</value>
+      <value>iio_fmcomms2_source_0</value>
+    </param>
+    <param>
+      <key>uri</key>
+      <value>ip:192.168.2.1</value>
     </param>
     <param>
       <key>frequency</key>
       <value>int(Frequency)</value>
     </param>
     <param>
-      <key>manual_gain</key>
+      <key>manual_gain1</key>
       <value>Gain1</value>
+    </param>
+    <param>
+      <key>manual_gain2</key>
+      <value>64.0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -2321,19 +2353,62 @@
     </param>
     <param>
       <key>quadrature</key>
-      <value>True</value>
+      <value>False</value>
     </param>
     <param>
       <key>rfdc</key>
       <value>False</value>
     </param>
     <param>
+      <key>rf_port_select</key>
+      <value>"A_BALANCED"</value>
+    </param>
+    <param>
       <key>bandwidth</key>
-      <value>int(Bandwidth)</value>
+      <value>20000000</value>
+    </param>
+    <param>
+      <key>rx1_en</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>rx2_en</key>
+      <value>False</value>
     </param>
     <param>
       <key>samplerate</key>
       <value>int(Bandwidth)</value>
+    </param>
+  </block>
+  <block>
+    <key>note</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(0, 155)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>note_1</value>
+    </param>
+    <param>
+      <key>note</key>
+      <value>The sequence of vector medians removes temporary RFI</value>
     </param>
   </block>
   <block>
@@ -2344,6 +2419,10 @@
     </param>
     <param>
       <key>autoscale</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>axislabels</key>
       <value>True</value>
     </param>
     <param>
@@ -2364,7 +2443,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(912, 1)</value>
+      <value>(918, 3)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2628,11 +2707,11 @@
     </param>
     <param>
       <key>xmax</key>
-      <value>.8</value>
+      <value>.5</value>
     </param>
     <param>
       <key>xmin</key>
-      <value>-.8</value>
+      <value>-.5</value>
     </param>
     <param>
       <key>name</key>
@@ -2687,7 +2766,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1144, 278)</value>
+      <value>(1142, 275)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -3181,7 +3260,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(48, 285)</value>
+      <value>(47, 315)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3228,7 +3307,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(208, 285)</value>
+      <value>(207, 315)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3275,7 +3354,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(376, 285)</value>
+      <value>(375, 315)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3322,7 +3401,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(720, 285)</value>
+      <value>(575, 315)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -3416,14 +3495,20 @@
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>pluto_source_0</source_block_id>
+    <source_block_id>fir_filter_xxx_0</source_block_id>
     <sink_block_id>blocks_complex_to_float_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
   <connection>
-    <source_block_id>pluto_source_0</source_block_id>
+    <source_block_id>iio_fmcomms2_source_0</source_block_id>
     <sink_block_id>blocks_stream_to_vector_0_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>iio_fmcomms2_source_0</source_block_id>
+    <sink_block_id>fir_filter_xxx_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>

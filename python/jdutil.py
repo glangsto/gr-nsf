@@ -413,6 +413,28 @@ def jd_to_datetime(jd):
     
     return datetime(year,month,day,hour,min,sec,micro)
 
+def mjd_to_datetime(mjd):
+    """
+    Convert Modified Julian Day to an `jdutil.datetime` object.
+    
+    Parameters
+    ----------
+    mjd : float
+        Modified Julian day.
+        
+    Returns
+    -------
+    dt : `jdutil.datetime` object
+        `jdutil.datetime` equivalent of Julian day.
+    
+    Examples
+    --------
+    >>> mjd_to_datetime(46113.25)
+    datetime(1985, 2, 17, 6, 0)
+    """
+    
+    return jd_to_datetime( mjd_to_jd( mjd))
+
 
 def timedelta_to_days(td):
     """

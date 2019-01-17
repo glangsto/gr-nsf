@@ -23,6 +23,7 @@ Glen Langston (National Science Foundation)
 # Boston, MA 02110-1301, USA.
 #
 # History
+# 19JAN16 GIL deal with loss of precision in gnuradio companion streams
 # 19JAN15 GIL cleanup and document; remove writing to another block
 # 19JAN14 GIL move magnitude calculation to another block
 # 19JAN13 GIL Working version of vector version of event capture
@@ -44,6 +45,23 @@ except:
     
 EVENT_MONITOR = 1
 EVENT_DETECT = 2
+
+def mjd_to_cmjd( mjd):
+    """
+    mjd_to_cmjd breaks the Modified Julian Day into two parts:
+    days+10ths of days -> real part of cmjd
+    remainder of day   -> imag part of cmjd
+    !!! HACK ALERT !!!
+    """
+    mjd = np.float(mjd)
+    days = np.int(mjd*10.)
+    hours = (mjd*10.) - days
+    hours = hours/10.           # hours is remainder of days
+    # floating point fraction
+    fdays = np.round(np.float(days)/10.,decimals=1)
+    cmjd = fdays + hours*1j# complex mjd for precision
+    return cmjd
+# end of mjd_to_cmjd
 
 class ra_vevent(gr.decim_block):
     """
@@ -75,7 +93,7 @@ class ra_vevent(gr.decim_block):
                                 in_sig=[np.complex64, np.float32], 
                                 # output vector and  3 scalar values
                                 out_sig=[(np.complex64, int(vlen)),
-                                         np.float32, np.float32, np.float32],
+                                         np.float32, np.float32, np.complex64],
                                 decim=int(vlen))        
         self.vlen = int(vlen)
         if vlen < 10:
@@ -83,7 +101,7 @@ class ra_vevent(gr.decim_block):
             exit()
         self.vlen2 = int(vlen/2)
         self.next = 0                  # where to place the next sample
-        self.next2 = self.vlen2        # where to look for next event
+        self.next2 = self.vlen2 + 1    # where to look for next event
         self.oneovern = 1./float(self.vlen)
         self.waitcount = self.vlen     # samples until declaring an event
         self.mode = int(mode)
@@ -111,7 +129,12 @@ class ra_vevent(gr.decim_block):
         self.dutc = datetime.timedelta(seconds=self.dt)
         # initialize event times
         self.eventutc = datetime.datetime.utcnow() - self.dutc
-        self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+        self.eventmjd = np.float(jdutil.datetime_to_mjd(self.eventutc))
+        # !!!!
+        # Hack alert! Had to send the MJD in to parts days, including 10ths
+        # Plus hours, where days and 10ths of days were subtracted
+        # !!!!
+        self.cmjd = mjd_to_cmjd( self.eventmjd)
         self.emagnitude = 0.            # event magnitude
         self.erms = 0.                  # event RMS
         print 'ra_event Vlen, Nsigma, dt: ', self.vlen, self.nsigma, self.dt
@@ -175,7 +198,9 @@ class ra_vevent(gr.decim_block):
             vlen = 10
             print "Using   Vector Length: ", vlen
         self.vlen = vlen
-        self.vlen2 = self.vlen/2
+        self.vlen2 = int(self.vlen/2)
+        self.next = 0
+        self.next2 = self.vlen2
         self.oneovern = 1./float(self.vlen)
         self.dt = float(self.vlen2)/self.sample_rate
         self.init_buffer()
@@ -230,7 +255,7 @@ class ra_vevent(gr.decim_block):
         if shift < 0:
             length = self.vlen + shift
             # copy shift samples
-            self.vevent[self.vlen+shift:self.vlen] = self.values[0:-shift]   
+            self.vevent[(self.vlen+shift):self.vlen] = self.values[0:-shift]   
             # copy length samples
             self.vevent[0:length] = self.values[-shift:self.vlen]
         else:
@@ -266,9 +291,9 @@ class ra_vevent(gr.decim_block):
 #        if noutports != 4:
 #            print '!!!!!!! Unexpected number of output ports: ', noutports
         outa = output_items[0]  # all outputs in PORT 0; vector of samples
-        outb = output_items[1]  # all outputs in PORT 1; peak magnitude
-        outc = output_items[2]  # all outputs in PORT 2; rms of samples
-        outd = output_items[3]  # all outputs in PORT 3; event mjd 
+        outb = output_items[1]  # all outputs PORT 1; peak magnitude
+        outc = output_items[2]  # all outputs PORT 2; rms of samples
+        outd = output_items[3]  # all outputs PORT 3; event mjd 
         nout = 0                # count number of output items
 
         # this code was optimized to remove some 'ifs' outside the main loop
@@ -285,6 +310,12 @@ class ra_vevent(gr.decim_block):
 
                 # now handle circular buffer and detect full buffer
                 self.next = self.next + 1
+
+                # next2 is the place to look for the last event
+                self.next2 = self.next2 + 1
+                if self.next2 >= self.vlen:
+                    self.next2 = 0
+
                 # determine when buffer is full.
                 # Always output an event each time the buffer cycles
                 # end cycling around the buffer
@@ -304,17 +335,17 @@ class ra_vevent(gr.decim_block):
                         self.eventutc = datetime.datetime.utcnow() - self.dutc
                         self.eventutc = self.eventutc - self.datetime_delay
                         self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+                        # complex to send out port with sufficient precision
+                        # do not update cmjd if monitoring
+                        # self.cmjd = mjd_to_cmjd( self.eventmjd)
                         self.ecount = 1
+                    # if time to output and event
                     outa[nout] = self.vevent  # ouput vector of samples
                     outb[nout] = self.emagnitude
                     outc[nout] = self.erms
-                    outd[nout] = self.eventmjd
+                    outd[nout] = self.cmjd
+#                    print "MJD: %12.6f %12.6f" % (self.cmjd.real, self.cmjd.imag)
                     nout = nout + 1
-
-                # next2 is the place to look for the last event
-                self.next2 = self.next2 + 1
-                if self.next2 >= self.vlen:
-                    self.next2 = 0
 
                 # if event found
                 if self.value2s[self.next2] > self.nsigmarms2:
@@ -327,17 +358,23 @@ class ra_vevent(gr.decim_block):
                         self.eventutc = self.eventutc - self.dutc
                         self.eventutc = self.eventutc - self.datetime_delay
                         self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
+                        # complex to send out port with sufficient precision
+                        self.cmjd = mjd_to_cmjd( self.eventmjd)
 
                         # deal with circular buffer in centering output event:
-                        self.select_event()
+#                        self.select_event()
+                        self.order_event()
                     
                         self.ecount = self.ecount + 1   # keep event count
-                        print 'Event: ', self.ecount
-                        print 'Utc event: ', self.eventutc
-                        print 'Utc MJD  : ', self.eventmjd
-                        print 'Magnitude: ', self.emagnitude, ' +/- ', self.erms
-                        print 'N in : ', ns, '; Nout: ',nout
+#                        print 'Event: ', self.ecount
+#                        print 'Utc event: ', self.eventutc
+#                        print 'Utc MJD  : %12.6f' % (self.eventmjd)
+#                        print 'Utc days : %12.6f + %12.6f' % (fdays, hours)
+#                        print 'Magnitude: ', self.emagnitude, ' +/- ',self.erms
+#                        print "MJD: %12.6f %12.6f" % (self.cmjd.real, self.cmjd.imag)
                         self.init_buffer()      # start again
+                # end if an event found
+
 
             # end for all input samples
             # end if buffer already full
@@ -364,20 +401,10 @@ class ra_vevent(gr.decim_block):
                     self.nsigmarms2 = self.nsigma2 * self.rms2
                     self.rmssum2 = 0.  # start new sum
                     
-                    # if monitoring, output latest vector
-                    if self.mode <= EVENT_MONITOR or self.ecount < 1: 
-                        self.vevent = copy.deepcopy(self.values)
-                        self.emagnitude = np.sqrt(max( self.value2s))
-                        self.erms = np.sqrt(self.rms2)
-                        self.eventutc = datetime.datetime.utcnow() - self.dutc
-                        self.eventutc = self.eventutc - self.datetime_delay
-                        self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
-                        self.ecount = 1
-                        
                     outa[nout] = self.vevent  # ouput vector of samples
                     outb[nout] = self.emagnitude
                     outc[nout] = self.erms
-                    outd[nout] = self.eventmjd
+                    outd[nout] = self.cmjd
                     nout = nout + 1
                 # check whether we've waited enough for buffer to fill again
                 if self.waitcount <= 0:
