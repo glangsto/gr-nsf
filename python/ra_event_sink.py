@@ -22,6 +22,7 @@ import datetime
 import numpy as np
 from gnuradio import gr
 import radioastronomy
+import cmjd_to_mjd
 
 try:
     import jdutil
@@ -186,13 +187,15 @@ class ra_event_sink(gr.sync_block):
             samples = inn[i]
             peaks = peak[i]
             rmss = rms[i]
+            cmjd = mjd[i]
+            # convert complex mjd into mjd
+            eventmjd = cmjd_to_mjd.cmjd_to_mjd( cmjd)
             # if same mjd as last time
-            # on ra_event side days is truncated to 10ths of days 
-            days = np.round(mjd[i].real * 10.)
-            fdays = np.float(days)/10.
-            hours = mjd[i].imag  # rest of days is in the hours part
-            eventmjd = fdays + hours
             if eventmjd > self.lastmjd:
+                print "Event Recorded: "
+                cmjd_to_mjd.print_cmjd( cmjd)
+                print "->"
+                cmjd_to_mjd.print_mjd( eventmjd)
                 self.lastmjd = eventmjd
                 self.obs.samples = samples
                 self.obs.nSamples = len(samples)
@@ -203,10 +206,9 @@ class ra_event_sink(gr.sync_block):
                 datestr = strnow.split('.')
                 daypart = datestr[0]
                 yymmdd = daypart[2:19]
-                peak 
                 print 'Sink Event: ', self.ecount
                 print 'Sink Utc : ', self.obs.utc
-                print 'Sink MJD : %12.6f' % (eventmjd)
+                print 'Sink MJD : %15.9f' % (eventmjd)
 #                print 'Sink days: %12.6f + %12.6f ' % (fdays, hours)
                 print 'Sink Magnitude: ', peaks, ' +/- ', rmss
                 if self.record == radioastronomy.INTRECORD:

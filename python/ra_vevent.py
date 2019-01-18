@@ -34,6 +34,8 @@ import datetime
 import numpy as np
 from gnuradio import gr
 import copy
+import cmjd_to_mjd
+
 try:
     import jdutil
 except:
@@ -45,23 +47,6 @@ except:
     
 EVENT_MONITOR = 1
 EVENT_DETECT = 2
-
-def mjd_to_cmjd( mjd):
-    """
-    mjd_to_cmjd breaks the Modified Julian Day into two parts:
-    days+10ths of days -> real part of cmjd
-    remainder of day   -> imag part of cmjd
-    !!! HACK ALERT !!!
-    """
-    mjd = np.float(mjd)
-    days = np.int(mjd*10.)
-    hours = (mjd*10.) - days
-    hours = hours/10.           # hours is remainder of days
-    # floating point fraction
-    fdays = np.round(np.float(days)/10.,decimals=1)
-    cmjd = fdays + hours*1j# complex mjd for precision
-    return cmjd
-# end of mjd_to_cmjd
 
 class ra_vevent(gr.decim_block):
     """
@@ -134,7 +119,7 @@ class ra_vevent(gr.decim_block):
         # Hack alert! Had to send the MJD in to parts days, including 10ths
         # Plus hours, where days and 10ths of days were subtracted
         # !!!!
-        self.cmjd = mjd_to_cmjd( self.eventmjd)
+        self.cmjd = cmjd_to_mjd.mjd_to_cmjd( self.eventmjd)
         self.emagnitude = 0.            # event magnitude
         self.erms = 0.                  # event RMS
         print 'ra_event Vlen, Nsigma, dt: ', self.vlen, self.nsigma, self.dt
@@ -359,11 +344,14 @@ class ra_vevent(gr.decim_block):
                         self.eventutc = self.eventutc - self.datetime_delay
                         self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
                         # complex to send out port with sufficient precision
-                        self.cmjd = mjd_to_cmjd( self.eventmjd)
-
+                        self.cmjd = cmjd_to_mjd.mjd_to_cmjd( self.eventmjd)
+                        print "Event Detected: "
+                        cmjd_to_mjd.print_mjd( self.eventmjd)
+                        print "->"
+                        cmjd_to_mjd.print_cmjd( self.cmjd)
                         # deal with circular buffer in centering output event:
-#                        self.select_event()
-                        self.order_event()
+                        self.select_event()
+#                        self.order_event()
                     
                         self.ecount = self.ecount + 1   # keep event count
 #                        print 'Event: ', self.ecount

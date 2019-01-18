@@ -279,9 +279,9 @@ class Spectrum(object):
         self.nSpec = 1
 # or the event; will reset nTime and nSamples to match event size
         self.nTime = 0
-        samples = np.zeros(2, dtype=np.complex64)
-        self.nSamples = len(samples)
-        self.samples = samples
+        self.epeak = 0.        # event peak
+        self.erms = 0.         # event RMS
+        self.nSamples = len(xdata)
 
     def __str__(self):
         """
@@ -440,8 +440,15 @@ class Spectrum(object):
         nSpec = self.nSpec
         outline = '# NSPEC     = '  + str(nSpec) + '\n'
         outfile.write(outline)
+        nTime = self.nTime
+        outline = '# NTIME     = '  + str(nTime) + '\n'
+        outfile.write(outline)
         nSamples = self.nSamples
         outline = '# NSAMPLES  = '  + str(nSamples) + '\n'
+        outfile.write(outline)
+        outline = '# EPEAK     = '  + str(self.epeak) + '\n'
+        outfile.write(outline)
+        outline = '# ERMS      = '  + str(self.erms) + '\n'
         outfile.write(outline)
         outline = '# REFCHAN   = '  + str(self.refChan) + '\n'
         outfile.write(outline)
@@ -504,6 +511,9 @@ class Spectrum(object):
         outline = '# AST_VERS  = '  + str("04.02") + '\n'
         outfile.write(outline)
 
+        if self.nTime > 0:            # if an event
+            self.nSpec = 0            # then not a spectrum
+            
         # if a spectrum in this data stream
         if self.nSpec > 0:
             dx = self.bandwidthHz/float(self.nChan)
@@ -628,6 +638,10 @@ class Spectrum(object):
                         print 'Bunit    ', self.bunit
                 if parts[1] == 'NSPEC':
                     self.nSpec = int(parts[3])
+                if parts[1] == 'NTIME':
+                    self.nTime = int(parts[3])
+                    if self.nTime > 0:
+                        self.nSpec = 0
                 if parts[1] == 'NAVE':
                     self.nave = int(parts[3])
                 if parts[1] == 'NMEDIAN':
@@ -646,6 +660,10 @@ class Spectrum(object):
                     self.etaB = float(parts[3])
                 if parts[1] == 'POLANGLE':
                     self.polAngle = float(parts[3])
+                if parts[1] == 'EPEAK':
+                    self.epeak = float(parts[3])
+                if parts[1] == 'ERMS':
+                    self.erms = float(parts[3])
                 # get one or more gains separated by ';'
                 if parts[1] == 'LNA' or parts[1] == 'GAINS':
                     gains = []
