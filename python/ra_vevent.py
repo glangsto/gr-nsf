@@ -345,10 +345,10 @@ class ra_vevent(gr.decim_block):
                         self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
                         # complex to send out port with sufficient precision
                         self.cmjd = cmjd_to_mjd.mjd_to_cmjd( self.eventmjd)
-                        print "Event Detected: "
-                        cmjd_to_mjd.print_mjd( self.eventmjd)
-                        print "->"
-                        cmjd_to_mjd.print_cmjd( self.cmjd)
+                        print "Event Detected: %15.9f (MJD) " % (self.eventmjd)
+#                        cmjd_to_mjd.print_mjd( self.eventmjd)
+#                        print "->"
+#                        cmjd_to_mjd.print_cmjd( self.cmjd)
                         # deal with circular buffer in centering output event:
                         self.select_event()
 #                        self.order_event()
