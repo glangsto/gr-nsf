@@ -1,14 +1,14 @@
 # File: Watch.not
-# NOTEA     = PlutoSdr+Odroid Test two GPIO amps
+# NOTEA     = Simulated Event Detection+Writing
 # NOTEB     = The GRC software was tested
 # OBSERVER  = Katherine, Nathaniel, Glen
 # DEVICE    = pluto=0
 # DATADIR   = ../data/
-# SITE      = PlutoSdr+Odroid Test two GPIO amps
-# CITY      = Arlington
-# REGION    = Virginia
+# SITE      = Simulated Event Detection+Writing
+# CITY      = Green Bank
+# REGION    = West Virginia
 # COUNTRY   = US
-# TELTYPE   = Pyramid Horn
+# TELTYPE   = No Horn, Gaussian Noise
 # FRAME     = TOPO
 # GAINS     = 15.0; 12.0; 12.0
 # GAIN1     = 15.0

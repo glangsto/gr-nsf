@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
+<?grc format='1' created='3.7.12'?>
 <flow_graph>
   <timestamp>Fri Apr 13 11:15:22 2018</timestamp>
   <block>
@@ -73,12 +73,20 @@
       <value>True</value>
     </param>
     <param>
+      <key>sizing_mode</key>
+      <value>fixed</value>
+    </param>
+    <param>
       <key>thread_safe_setters</key>
       <value></value>
     </param>
     <param>
       <key>title</key>
       <value>Event Detection Demo</value>
+    </param>
+    <param>
+      <key>placement</key>
+      <value>(0,0)</value>
     </param>
   </block>
   <block>
@@ -322,7 +330,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(167, 355)</value>
+      <value>(24, 536)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -420,7 +428,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 224)</value>
+      <value>(8, 256)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -542,7 +550,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(24, 104)</value>
+      <value>(24, 128)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -597,7 +605,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(223, 111)</value>
+      <value>(264, 112)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -648,7 +656,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(759, 463)</value>
+      <value>(776, 512)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -691,7 +699,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(343, 375)</value>
+      <value>(328, 400)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -738,7 +746,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(591, 139)</value>
+      <value>(592, 112)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -844,7 +852,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(311, 139)</value>
+      <value>(368, 160)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -899,7 +907,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(759, 235)</value>
+      <value>(768, 240)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -958,7 +966,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(727, 547)</value>
+      <value>(760, 624)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1189,7 +1197,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(942, 459)</value>
+      <value>(976, 512)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1420,7 +1428,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(934, 339)</value>
+      <value>(976, 368)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1659,7 +1667,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(918, 123)</value>
+      <value>(952, 96)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1691,7 +1699,7 @@
     </param>
     <param>
       <key>label1</key>
-      <value></value>
+      <value>I</value>
     </param>
     <param>
       <key>marker1</key>
@@ -1739,7 +1747,7 @@
     </param>
     <param>
       <key>label2</key>
-      <value></value>
+      <value>Q</value>
     </param>
     <param>
       <key>marker2</key>
@@ -1936,6 +1944,10 @@
     <param>
       <key>srate</key>
       <value>samp_rate</value>
+    </param>
+    <param>
+      <key>stemplot</key>
+      <value>False</value>
     </param>
     <param>
       <key>tr_chan</key>
@@ -2022,7 +2034,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(918, 219)</value>
+      <value>(952, 224)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2054,7 +2066,7 @@
     </param>
     <param>
       <key>label1</key>
-      <value></value>
+      <value>I</value>
     </param>
     <param>
       <key>marker1</key>
@@ -2102,7 +2114,7 @@
     </param>
     <param>
       <key>label2</key>
-      <value></value>
+      <value>Q</value>
     </param>
     <param>
       <key>marker2</key>
@@ -2301,6 +2313,10 @@
       <value>samp_rate</value>
     </param>
     <param>
+      <key>stemplot</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>tr_chan</key>
       <value>0</value>
     </param>
@@ -2369,7 +2385,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(751, 311)</value>
+      <value>(768, 312)</value>
     </param>
     <param>
       <key>_rotation</key>

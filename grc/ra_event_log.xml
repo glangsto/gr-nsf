@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<block>
+  <name>Event Log</name>
+  <key>ra_event_log</key>
+  <category>[ra]</category>
+  <import>import ra_event_log</import>
+  <make>ra_event_log.ra_event_log( $logname, $note, $vlen, $sample_rate)</make>
+  <callback>set_logname( $logsetup)</callback>
+  <callback>set_note( $note)</callback>
+  <callback>set_vlen( $vlen)</callback>
+  <callback>set_sample_rate( $sample_rate)</callback>
+  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
+       Sub-nodes:
+       * name
+       * key (makes the value accessible as $keyname, e.g. in the make node)
+       * type -->
+  <param>
+    <name>Log File Name</name>
+    <key>logname</key>
+    <value></value>
+    <type>string</type>
+  </param>
+  <param>
+    <name>Note</name>
+    <key>note</key>
+    <value>Event Detection</value>
+    <type>string</type>
+  </param>
+  <param>
+    <name>Sample Rate (Hz)</name>
+    <key>sample_rate</key>
+    <value>1.E6</value>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Vec Length</name>
+    <key>vlen</key>
+    <value>128</value>
+    <type>int</type>
+  </param>
+  <!-- Make one 'sink' node per input. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+  <sink>
+    <name>magnitude</name>
+    <type>float</type>
+    <vlen>1</vlen>
+  </sink>
+  <sink>
+    <name>stddev</name>
+    <type>float</type>
+    <vlen>1</vlen>
+  </sink>
+  <sink>
+    <name>eventmjd</name>
+    <type>complex</type>
+    <vlen>1</vlen>
+  </sink>
+  <!-- Make one 'source' node per output. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+</block>

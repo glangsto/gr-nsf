@@ -2,6 +2,7 @@
 Class defining a Radio Frequency Spectrum
 Includes reading and writing ascii files
 HISTORY
+19JAN20 GIL add function to return mjd, seconds, microseconds from cmjd
 19JAN16 GIL add Event Reading and Writing
 18MAY20 GIL code cleanup
 18APR18 GIL add NAVE to save complete obsevering setup
@@ -57,6 +58,23 @@ def print_cmjd( cmjd):
     microseconds = 1.E6 * (seconds-iseconds)
     print 'cmjd: %6d days + %5d s + %10.9f' % (idays, iseconds, microseconds)
     return
+
+def cmjd_to_mjd_seconds_micro( cmjd):
+    """
+    Diagnostic printout of complex MJD to full accuracy
+    """
+    print 'cmjd: ', cmjd.real, cmjd.imag
+    days = np.round(cmjd.real*FACTOR, decimals=0)
+    idays = np.int(days)
+    partdays = (days - idays)/FACTOR  # digits of fraction of a day
+    partdays = partdays + cmjd.imag
+    idays = idays / FACTOR
+    if partdays > 1.:
+        print 'cmjd Error: partdays: ',partdays, ' days: ', days
+    seconds = partdays*86400.
+    iseconds = np.int(seconds)
+    microseconds = 1.E6 * (seconds-iseconds)
+    return (idays, iseconds, microseconds)
 
 def print_mjd( mjd):
     """
