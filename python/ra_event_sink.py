@@ -190,9 +190,9 @@ class ra_event_sink(gr.sync_block):
             cmjd = mjd[i]
             # convert complex mjd into mjd
             eventmjd = cmjd_to_mjd.cmjd_to_mjd( cmjd)
-            # if same mjd as last time
+            # if new mjd 
             if eventmjd > self.lastmjd:
-                print "Event Recorded: %15.9f (MJD)" % (eventmjd)
+#                print "Event Recorded: %15.9f (MJD)" % (eventmjd)
 #                cmjd_to_mjd.print_cmjd( cmjd)
 #                print "->"
 #                cmjd_to_mjd.print_mjd( eventmjd)
@@ -206,11 +206,11 @@ class ra_event_sink(gr.sync_block):
                 datestr = strnow.split('.')
                 daypart = datestr[0]
                 yymmdd = daypart[2:19]
-                print 'Sink Event: ', self.ecount
-                print 'Sink Utc : ', self.obs.utc
+#                print 'Sink Event: ', self.ecount
+#                print 'Sink Utc : ', self.obs.utc
 #                print 'Sink MJD : %15.9f' % (eventmjd)
 #                print 'Sink days: %12.6f + %12.6f ' % (fdays, hours)
-                print 'Sink Magnitude: ', peaks, ' +/- ', rmss
+#                print 'Sink Magnitude: ', peaks, ' +/- ', rmss
                 if self.record == radioastronomy.INTRECORD:
                     #remove : from time
                     yymmdd = yymmdd.replace(":", "")

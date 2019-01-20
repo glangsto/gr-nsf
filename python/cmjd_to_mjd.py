@@ -45,7 +45,7 @@ def print_cmjd( cmjd):
     """
     Diagnostic printout of complex MJD to full accuracy
     """
-    print 'cmjd: ', cmjd.real, cmjd.imag
+#    print 'cmjd: ', cmjd.real, cmjd.imag
     days = np.round(cmjd.real*FACTOR, decimals=0)
     idays = np.int(days)
     partdays = (days - idays)/FACTOR  # digits of fraction of a day
@@ -63,18 +63,14 @@ def cmjd_to_mjd_seconds_micro( cmjd):
     """
     Diagnostic printout of complex MJD to full accuracy
     """
-    print 'cmjd: ', cmjd.real, cmjd.imag
-    days = np.round(cmjd.real*FACTOR, decimals=0)
-    idays = np.int(days)
-    partdays = (days - idays)/FACTOR  # digits of fraction of a day
-    partdays = partdays + cmjd.imag
-    idays = idays / FACTOR
-    if partdays > 1.:
-        print 'cmjd Error: partdays: ',partdays, ' days: ', days
+#    print 'cmjd: ', cmjd.real, cmjd.imag
+    mjd = cmjd_to_mjd( cmjd)
+    imjd = np.int( mjd)
+    partdays = (mjd - imjd)
     seconds = partdays*86400.
     iseconds = np.int(seconds)
     microseconds = 1.E6 * (seconds-iseconds)
-    return (idays, iseconds, microseconds)
+    return (imjd, iseconds, microseconds)
 
 def print_mjd( mjd):
     """

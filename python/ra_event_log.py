@@ -57,7 +57,7 @@ class ra_event_log(gr.sync_block):
         self.setupdir = "./"
         self.logname = str(logname)
         self.note = str(note)
-        self.pformat = "%04d %15.9f %04d %10.3f %10.6f %10.6f" 
+        self.pformat = "%04d %15.9f %05d %10.3f %10.6f %10.6f\n" 
         self.set_note( note)          # should set all values before opening log file
         self.set_sample_rate( bandwidth)
         self.set_logname(logname)
@@ -107,21 +107,23 @@ class ra_event_log(gr.sync_block):
             logname = "Event-%s.log" % (yymmdd)  # create from date
         self.logname = logname
 
-        try:
-            with open( self.logname, "w") as f:
-                outline = "# Event Log Opened on %s " % (self.startutc.isoformat())
-                f.write(outline)
-                outline = "# %s " % (self.note)
-                f.write(outline)
-                outline = "# bandwidth = %15.6 " % (self.bandwidth)
-                f.write(outline)
-                outline = "#   N        MJD             s          usec      Peak       RMS"
-                f.write(outline)
-                f.close()
-        except:
-            print "!"
-            print "! Can not write to log file: %s" % (self.logname)
-            print "!"
+        with open( self.logname, "w") as f:
+            outline = "# Event Log Opened on %s\n" % (self.startutc.isoformat())
+            f.write(outline)
+            outline = "# %s\n" % (self.note)
+            f.write(outline)
+            outline = "# bandwidth = %15.6f\n" % (self.bandwidth)
+            f.write(outline)
+            outline = "# vlen      = %6d\n" % (self.vlen)
+            f.write(outline)
+            outline = "#  N      MJD          s      u sec      Peak       RMS\n"
+            f.write(outline)
+            f.close()
+#        except:
+#            print "!"
+#            print "! Can not write to log file: %s" % (self.logname)
+#            print "!"
+#            continue
 
         return
     
@@ -167,9 +169,7 @@ class ra_event_log(gr.sync_block):
                         f.write(outline)
                         f.close()
                 except:
-                    print "!"
-                    print "! Can not write to log file: %s" % (self.logname)
-                    print "!"
+                    continue
             # end for all input events
         return nout
     # end event_log()

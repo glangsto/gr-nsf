@@ -5,7 +5,7 @@
 # Title: Event Detection  and Write Demo
 # Author: Glen Langston
 # Description: This demo tests the event detection and writing blocks
-# Generated: Sat Jan 19 08:18:53 2019
+# Generated: Sun Jan 20 13:26:00 2019
 ##################################################
 
 if __name__ == '__main__':
@@ -29,6 +29,7 @@ from gnuradio.eng_option import eng_option
 from gnuradio.filter import firdes
 from gnuradio.qtgui import Range, RangeWidget
 from optparse import OptionParser
+import ra_event_log
 import ra_event_sink
 import ra_vevent
 import sip
@@ -116,6 +117,7 @@ class eventwrite(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setColumnStretch(c, 1)
         self.ra_vevent_0 = ra_vevent.ra_vevent(fftsize, mode, nsigma, samp_rate, 3./samp_rate)
         self.ra_event_sink_0 = ra_event_sink.ra_event_sink('Watch.not', fftsize, samp_rate, EventMode)
+        self.ra_event_log_0 = ra_event_log.ra_event_log( '', 'Event Detection', fftsize, samp_rate)
         self.qtgui_time_sink_x_0_0 = qtgui.time_sink_c(
         	fftsize, #size
         	samp_rate, #samp_rate
@@ -357,6 +359,9 @@ class eventwrite(gr.top_block, Qt.QWidget):
         self.connect((self.ra_vevent_0, 0), (self.blocks_vector_to_stream_0, 0))
         self.connect((self.ra_vevent_0, 1), (self.qtgui_number_sink_0, 0))
         self.connect((self.ra_vevent_0, 2), (self.qtgui_number_sink_0, 1))
+        self.connect((self.ra_vevent_0, 1), (self.ra_event_log_0, 0))
+        self.connect((self.ra_vevent_0, 2), (self.ra_event_log_0, 1))
+        self.connect((self.ra_vevent_0, 3), (self.ra_event_log_0, 2))
         self.connect((self.ra_vevent_0, 3), (self.ra_event_sink_0, 3))
         self.connect((self.ra_vevent_0, 1), (self.ra_event_sink_0, 1))
         self.connect((self.ra_vevent_0, 0), (self.ra_event_sink_0, 0))
@@ -375,6 +380,7 @@ class eventwrite(gr.top_block, Qt.QWidget):
         self.ra_vevent_0.set_sample_rate( self.samp_rate)
         self.ra_vevent_0.set_sample_delay( 3./self.samp_rate)
         self.ra_event_sink_0.set_sample_rate( self.samp_rate)
+        self.ra_event_log_0.set_sample_rate( self.samp_rate)
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.blocks_throttle_0.set_sample_rate(self.samp_rate)
@@ -403,6 +409,7 @@ class eventwrite(gr.top_block, Qt.QWidget):
         self.fftsize = fftsize
         self.ra_vevent_0.set_vlen( self.fftsize)
         self.ra_event_sink_0.set_vlen( self.fftsize)
+        self.ra_event_log_0.set_vlen( self.fftsize)
         self.blocks_delay_0.set_dly(2*self.fftsize)
 
     def get_EventMode(self):

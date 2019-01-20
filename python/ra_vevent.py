@@ -78,7 +78,7 @@ class ra_vevent(gr.decim_block):
                                 in_sig=[np.complex64, np.float32], 
                                 # output vector and  3 scalar values
                                 out_sig=[(np.complex64, int(vlen)),
-                                         np.float32, np.float32, np.complex64],
+                                        np.float32, np.float32, np.complex64],
                                 decim=int(vlen))        
         self.vlen = int(vlen)
         if vlen < 10:
@@ -323,7 +323,8 @@ class ra_vevent(gr.decim_block):
                         # complex to send out port with sufficient precision
                         # do not update cmjd if monitoring
                         # self.cmjd = mjd_to_cmjd( self.eventmjd)
-                        self.ecount = 1
+                        self.ecount = 0
+                        self.lastmjd = self.eventmjd
                     # if time to output and event
                     outa[nout] = self.vevent  # ouput vector of samples
                     outb[nout] = self.emagnitude
@@ -345,7 +346,7 @@ class ra_vevent(gr.decim_block):
                         self.eventmjd = jdutil.datetime_to_mjd(self.eventutc)
                         # complex to send out port with sufficient precision
                         self.cmjd = cmjd_to_mjd.mjd_to_cmjd( self.eventmjd)
-                        print "Event Detected: %15.9f (MJD) " % (self.eventmjd)
+                        print "Event Detected: %15.9f (MJD) %9.4f %8.4f" % (self.eventmjd, self.emagnitude, self.erms)
 #                        cmjd_to_mjd.print_mjd( self.eventmjd)
 #                        print "->"
 #                        cmjd_to_mjd.print_cmjd( self.cmjd)

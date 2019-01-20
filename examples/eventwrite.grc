@@ -22,7 +22,7 @@
     </param>
     <param>
       <key>description</key>
-      <value>This demo tests the event detection block</value>
+      <value>This demo tests the event detection and writing blocks</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -30,7 +30,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(343, 3)</value>
+      <value>(224, 0)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -46,7 +46,7 @@
     </param>
     <param>
       <key>id</key>
-      <value>eventdemo</value>
+      <value>eventwrite</value>
     </param>
     <param>
       <key>max_nouts</key>
@@ -82,7 +82,7 @@
     </param>
     <param>
       <key>title</key>
-      <value>Event Detection Demo</value>
+      <value>Event Detection  and Write Demo</value>
     </param>
     <param>
       <key>placement</key>
@@ -200,7 +200,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(567, 11)</value>
+      <value>(336, 520)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -389,7 +389,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(679, 11)</value>
+      <value>(472, 536)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -605,7 +605,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(264, 112)</value>
+      <value>(256, 128)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -656,7 +656,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(776, 512)</value>
+      <value>(800, 640)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -746,7 +746,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(592, 112)</value>
+      <value>(560, 24)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -907,7 +907,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(768, 240)</value>
+      <value>(768, 128)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -966,7 +966,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(760, 624)</value>
+      <value>(784, 752)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1197,7 +1197,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 512)</value>
+      <value>(1008, 640)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1428,7 +1428,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(976, 368)</value>
+      <value>(1040, 272)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -1667,7 +1667,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 96)</value>
+      <value>(952, 8)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2034,7 +2034,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 224)</value>
+      <value>(952, 112)</value>
     </param>
     <param>
       <key>gui_hint</key>
@@ -2366,6 +2366,53 @@
     </param>
   </block>
   <block>
+    <key>ra_event_log</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(824, 464)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>ra_event_log_0</value>
+    </param>
+    <param>
+      <key>logname</key>
+      <value></value>
+    </param>
+    <param>
+      <key>note</key>
+      <value>Event Detection</value>
+    </param>
+    <param>
+      <key>sample_rate</key>
+      <value>samp_rate</value>
+    </param>
+    <param>
+      <key>vlen</key>
+      <value>fftsize</value>
+    </param>
+  </block>
+  <block>
     <key>ra_event_sink</key>
     <param>
       <key>alias</key>
@@ -2385,7 +2432,7 @@
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(768, 312)</value>
+      <value>(832, 216)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2571,6 +2618,12 @@
   </connection>
   <connection>
     <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>ra_event_log_0</sink_block_id>
+    <source_key>3</source_key>
+    <sink_key>2</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
     <sink_block_id>ra_event_sink_0</sink_block_id>
     <source_key>3</source_key>
     <sink_key>3</sink_key>
@@ -2578,6 +2631,12 @@
   <connection>
     <source_block_id>ra_vevent_0</source_block_id>
     <sink_block_id>qtgui_number_sink_0</sink_block_id>
+    <source_key>1</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>ra_event_log_0</sink_block_id>
     <source_key>1</source_key>
     <sink_key>0</sink_key>
   </connection>
@@ -2602,6 +2661,12 @@
   <connection>
     <source_block_id>ra_vevent_0</source_block_id>
     <sink_block_id>qtgui_number_sink_0</sink_block_id>
+    <source_key>2</source_key>
+    <sink_key>1</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>ra_vevent_0</source_block_id>
+    <sink_block_id>ra_event_log_0</sink_block_id>
     <source_key>2</source_key>
     <sink_key>1</sink_key>
   </connection>
