@@ -27,11 +27,8 @@ import pmt
 class ra_event_log(gr.sync_block):
     """
     Event Log writes a summary of detected events to a log file.  The input
-    1) Peak of detected event
-    2) RMS of samples near in time to detected event
-    3) Event Modified Julian Date (complex, for precision)
-    The real and imaginary parts of the MJD sum to the actual MJD.
-    Precision is lost during optimization in gnuradio value transfers.
+    1) vector of I,Q (complex) samples centered in time on the event
+    The Event MJD, Peak and RMS are passed as tags
     Parameters are
     1) LogFileName
     2) Note on Purpose of event detection
@@ -122,11 +119,6 @@ class ra_event_log(gr.sync_block):
             outline = "#  N      MJD       second  micro sec.    Peak       RMS\n"
             f.write(outline)
             f.close()
-#        except:
-#            print "!"
-#            print "! Can not write to log file: %s" % (self.logname)
-#            print "!"
-#            continue
 
         return
     
@@ -146,10 +138,10 @@ class ra_event_log(gr.sync_block):
         # get the number of input vectors
         nv = len(inn)           # number of events in this port
         
-        # get the number of input vectors
+        # get any tags of a new detected event
         tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+        # if there are tags, then a new event was detected
         if len(tags) > 0:
-#            print 'Event Tags detected in sink: ', len(tags)
             for tag in tags:
 #                print 'Tag: ', tag
                 value = pmt.to_python(tag.value)
@@ -164,12 +156,12 @@ class ra_event_log(gr.sync_block):
 #                    print 'Tag RMs : %7.4f' % (self.erms)
                 else:
                     print 'Unknown Tag: ', value
-        # for all input events
+
+        # for all input vectors
         for i in range(nv):
-            # get the length of one input
-            # convert complex mjd into mjd
-            # if same mjd as last time
+            # if a new Modified Julian Day, then an event was detected
             if self.eventmjd > self.lastmjd:
+                # log the event
                 self.ecount = self.ecount + 1
                 print "\nEvent   Logged: %15.9f (MJD) %9.4f %8.4f" % (self.eventmjd, self.emagnitude, self.erms)
                 imjd = np.int(self.eventmjd)
