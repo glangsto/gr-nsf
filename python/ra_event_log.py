@@ -22,7 +22,7 @@ import sys
 import datetime
 import numpy as np
 from gnuradio import gr
-import cmjd_to_mjd
+import pmt
 
 class ra_event_log(gr.sync_block):
     """
@@ -44,9 +44,9 @@ class ra_event_log(gr.sync_block):
                                name="ra_event_log",              
                                # inputs: 
                                # peak, rms, Event MJD
-                               in_sig=[np.float32, np.float32, np.complex64],
+                               in_sig=[(np.complex64, int(vlen))],
                                # no outputs
-                               out_sig=[], )
+                               out_sig=None, )
         vlen = int(vlen)
         self.vlen = vlen
         self.ecount = 0
@@ -56,6 +56,9 @@ class ra_event_log(gr.sync_block):
         self.startutc = now
         self.setupdir = "./"
         self.logname = str(logname)
+        self.eventmjd = 0.
+        self.emagnitude = 0.
+        self.erms = 0.
         self.note = str(note)
         self.pformat = "%04d %15.9f %05d %10.3f %10.6f %10.6f\n" 
         self.set_note( note)          # should set all values before opening log file
@@ -116,7 +119,7 @@ class ra_event_log(gr.sync_block):
             f.write(outline)
             outline = "# vlen      = %6d\n" % (self.vlen)
             f.write(outline)
-            outline = "#  N      MJD          s      u sec      Peak       RMS\n"
+            outline = "#  N      MJD       second  micro sec.    Peak       RMS\n"
             f.write(outline)
             f.close()
 #        except:
@@ -138,32 +141,43 @@ class ra_event_log(gr.sync_block):
         """
         Work averages all input vectors and outputs one vector for each N inputs
         """
-        peak = input_items[0]   # peak magnitudes of events
-        rms  = input_items[1]   # rmss of samples near events
-        mjd  = input_items[2]   # Modified Julian Dates of events (complex)
+        inn = input_items[0]    # vectors of I/Q (complex) samples
         
         # get the number of input vectors
-
-#        noutports = len(output_items)
-#        if noutports != 1:
-#            print '!!!!!!! Unexpected number of output ports: ', noutports
-        nout = 0
-        nv = len(peak)          # get input number of events
-
+        nv = len(inn)           # number of events in this port
+        
+        # get the number of input vectors
+        tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+        if len(tags) > 0:
+#            print 'Event Tags detected in sink: ', len(tags)
+            for tag in tags:
+#                print 'Tag: ', tag
+                value = pmt.to_python(tag.value)
+                if value[0] == 'MJD':
+                    self.eventmjd = value[1]
+#                    print 'Tag MJD : %15.9f' % (self.eventmjd)
+                elif value[0] == 'PEAK':
+                    self.emagnitude = value[1]
+#                    print 'Tag PEAK: %7.4f' % (self.emagnitude)
+                elif value[0] == 'RMS':
+                    self.erms = value[1]
+#                    print 'Tag RMs : %7.4f' % (self.erms)
+                else:
+                    print 'Unknown Tag: ', value
+        # for all input events
         for i in range(nv):
             # get the length of one input
-            peaks = peak[i]
-            rmss = rms[i]
-            cmjd = mjd[i]
             # convert complex mjd into mjd
-            eventmjd = cmjd_to_mjd.cmjd_to_mjd( cmjd)
             # if same mjd as last time
-            if eventmjd > self.lastmjd:
+            if self.eventmjd > self.lastmjd:
                 self.ecount = self.ecount + 1
-                print "Event Logged:   %15.9f (MJD)" % (eventmjd)
-                imjd, isecond, microseconds = cmjd_to_mjd.cmjd_to_mjd_seconds_micro( cmjd)
-                self.lastmjd = eventmjd
-                outline = self.pformat % (self.ecount, eventmjd, isecond, microseconds, peaks, rmss)
+                print "\nEvent   Logged: %15.9f (MJD) %9.4f %8.4f" % (self.eventmjd, self.emagnitude, self.erms)
+                imjd = np.int(self.eventmjd)
+                seconds = (self.eventmjd - imjd)*86400.
+                isecond = np.int(seconds)
+                microseconds = (seconds - isecond) * 1.e6
+                self.lastmjd = self.eventmjd
+                outline = self.pformat % (self.ecount, self.eventmjd, isecond, microseconds, self.emagnitude, self.erms)
                 try:
                     with open( self.logname, "a+") as f:
                         f.write(outline)
@@ -171,7 +185,7 @@ class ra_event_log(gr.sync_block):
                 except:
                     continue
             # end for all input events
-        return nout
+        return nv
     # end event_log()
 
 

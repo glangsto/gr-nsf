@@ -5,7 +5,7 @@
 # Title: Event Detection  and Write Demo
 # Author: Glen Langston
 # Description: This demo tests the event detection and writing blocks
-# Generated: Sun Jan 20 13:26:00 2019
+# Generated: Wed Jan 23 14:00:52 2019
 ##################################################
 
 if __name__ == '__main__':
@@ -228,111 +228,10 @@ class eventwrite(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setRowStretch(r, 1)
         for c in range(0, 5):
             self.top_grid_layout.setColumnStretch(c, 1)
-        self.qtgui_number_sink_0_1 = qtgui.number_sink(
-            gr.sizeof_float,
-            0,
-            qtgui.NUM_GRAPH_NONE,
-            1
-        )
-        self.qtgui_number_sink_0_1.set_update_time(1)
-        self.qtgui_number_sink_0_1.set_title("")
-
-        labels = ['Event Count', 'RMS', 'Event Mjd', '', '',
-                  '', '', '', '', '']
-        units = ['', '', '', '', '',
-                 '', '', '', '', '']
-        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
-                  ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
-        factor = [1, 1, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        for i in xrange(1):
-            self.qtgui_number_sink_0_1.set_min(i, -1)
-            self.qtgui_number_sink_0_1.set_max(i, 1)
-            self.qtgui_number_sink_0_1.set_color(i, colors[i][0], colors[i][1])
-            if len(labels[i]) == 0:
-                self.qtgui_number_sink_0_1.set_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_number_sink_0_1.set_label(i, labels[i])
-            self.qtgui_number_sink_0_1.set_unit(i, units[i])
-            self.qtgui_number_sink_0_1.set_factor(i, factor[i])
-
-        self.qtgui_number_sink_0_1.enable_autoscale(False)
-        self._qtgui_number_sink_0_1_win = sip.wrapinstance(self.qtgui_number_sink_0_1.pyqwidget(), Qt.QWidget)
-        self.top_grid_layout.addWidget(self._qtgui_number_sink_0_1_win)
-        self.qtgui_number_sink_0_0_0 = qtgui.number_sink(
-            gr.sizeof_float,
-            0,
-            qtgui.NUM_GRAPH_NONE,
-            2
-        )
-        self.qtgui_number_sink_0_0_0.set_update_time(1)
-        self.qtgui_number_sink_0_0_0.set_title("")
-
-        labels = ['Event Days (Accurate to 10ths)', 'Event Time', 'Event Mjd', '', '',
-                  '', '', '', '', '']
-        units = ['', '', '', '', '',
-                 '', '', '', '', '']
-        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
-                  ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
-        factor = [1, 1, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        for i in xrange(2):
-            self.qtgui_number_sink_0_0_0.set_min(i, -1)
-            self.qtgui_number_sink_0_0_0.set_max(i, 1)
-            self.qtgui_number_sink_0_0_0.set_color(i, colors[i][0], colors[i][1])
-            if len(labels[i]) == 0:
-                self.qtgui_number_sink_0_0_0.set_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_number_sink_0_0_0.set_label(i, labels[i])
-            self.qtgui_number_sink_0_0_0.set_unit(i, units[i])
-            self.qtgui_number_sink_0_0_0.set_factor(i, factor[i])
-
-        self.qtgui_number_sink_0_0_0.enable_autoscale(False)
-        self._qtgui_number_sink_0_0_0_win = sip.wrapinstance(self.qtgui_number_sink_0_0_0.pyqwidget(), Qt.QWidget)
-        self.top_grid_layout.addWidget(self._qtgui_number_sink_0_0_0_win, 13, 3, 1, 1)
-        for r in range(13, 14):
-            self.top_grid_layout.setRowStretch(r, 1)
-        for c in range(3, 4):
-            self.top_grid_layout.setColumnStretch(c, 1)
-        self.qtgui_number_sink_0 = qtgui.number_sink(
-            gr.sizeof_float,
-            0,
-            qtgui.NUM_GRAPH_NONE,
-            2
-        )
-        self.qtgui_number_sink_0.set_update_time(1)
-        self.qtgui_number_sink_0.set_title("")
-
-        labels = ['Magnitude', 'RMS', 'Event Mjd', '', '',
-                  '', '', '', '', '']
-        units = ['', '', '', '', '',
-                 '', '', '', '', '']
-        colors = [("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"),
-                  ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black"), ("black", "black")]
-        factor = [1, 1, 1, 1, 1,
-                  1, 1, 1, 1, 1]
-        for i in xrange(2):
-            self.qtgui_number_sink_0.set_min(i, -1)
-            self.qtgui_number_sink_0.set_max(i, 1)
-            self.qtgui_number_sink_0.set_color(i, colors[i][0], colors[i][1])
-            if len(labels[i]) == 0:
-                self.qtgui_number_sink_0.set_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_number_sink_0.set_label(i, labels[i])
-            self.qtgui_number_sink_0.set_unit(i, units[i])
-            self.qtgui_number_sink_0.set_factor(i, factor[i])
-
-        self.qtgui_number_sink_0.enable_autoscale(False)
-        self._qtgui_number_sink_0_win = sip.wrapinstance(self.qtgui_number_sink_0.pyqwidget(), Qt.QWidget)
-        self.top_grid_layout.addWidget(self._qtgui_number_sink_0_win)
         self.blocks_vector_to_stream_0 = blocks.vector_to_stream(gr.sizeof_gr_complex*1, fftsize)
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_gr_complex*1, samp_rate,True)
-        self.blocks_delay_1 = blocks.delay(gr.sizeof_gr_complex*1, 1)
         self.blocks_delay_0 = blocks.delay(gr.sizeof_gr_complex*1, 2*fftsize)
-        self.blocks_complex_to_mag_squared_0 = blocks.complex_to_mag_squared(1)
-        self.blocks_complex_to_float_0 = blocks.complex_to_float(1)
         self.blocks_add_xx_0 = blocks.add_vcc(1)
-        self.analog_sig_source_x_0_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, 2e5, .05, 0)
         self.analog_sig_source_x_0 = analog.sig_source_c(samp_rate, analog.GR_COS_WAVE, 3e5, .1, 0)
         self.analog_noise_source_x_0 = analog.noise_source_c(analog.GR_GAUSSIAN, 1, 0)
 
@@ -341,31 +240,16 @@ class eventwrite(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_noise_source_x_0, 0), (self.blocks_add_xx_0, 2))
+        self.connect((self.analog_noise_source_x_0, 0), (self.blocks_add_xx_0, 1))
         self.connect((self.analog_sig_source_x_0, 0), (self.blocks_add_xx_0, 0))
-        self.connect((self.analog_sig_source_x_0_0, 0), (self.blocks_add_xx_0, 1))
         self.connect((self.blocks_add_xx_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.blocks_complex_to_float_0, 1), (self.qtgui_number_sink_0_0_0, 1))
-        self.connect((self.blocks_complex_to_float_0, 0), (self.qtgui_number_sink_0_0_0, 0))
-        self.connect((self.blocks_complex_to_mag_squared_0, 0), (self.ra_vevent_0, 1))
         self.connect((self.blocks_delay_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.blocks_delay_1, 0), (self.ra_vevent_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_complex_to_mag_squared_0, 0))
         self.connect((self.blocks_throttle_0, 0), (self.blocks_delay_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.blocks_delay_1, 0))
+        self.connect((self.blocks_throttle_0, 0), (self.ra_vevent_0, 0))
         self.connect((self.blocks_vector_to_stream_0, 0), (self.qtgui_time_sink_x_0_0, 0))
-        self.connect((self.ra_event_sink_0, 0), (self.qtgui_number_sink_0_1, 0))
-        self.connect((self.ra_vevent_0, 3), (self.blocks_complex_to_float_0, 0))
         self.connect((self.ra_vevent_0, 0), (self.blocks_vector_to_stream_0, 0))
-        self.connect((self.ra_vevent_0, 1), (self.qtgui_number_sink_0, 0))
-        self.connect((self.ra_vevent_0, 2), (self.qtgui_number_sink_0, 1))
-        self.connect((self.ra_vevent_0, 1), (self.ra_event_log_0, 0))
-        self.connect((self.ra_vevent_0, 2), (self.ra_event_log_0, 1))
-        self.connect((self.ra_vevent_0, 3), (self.ra_event_log_0, 2))
-        self.connect((self.ra_vevent_0, 3), (self.ra_event_sink_0, 3))
-        self.connect((self.ra_vevent_0, 1), (self.ra_event_sink_0, 1))
+        self.connect((self.ra_vevent_0, 0), (self.ra_event_log_0, 0))
         self.connect((self.ra_vevent_0, 0), (self.ra_event_sink_0, 0))
-        self.connect((self.ra_vevent_0, 2), (self.ra_event_sink_0, 2))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "eventwrite")
@@ -384,7 +268,6 @@ class eventwrite(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.blocks_throttle_0.set_sample_rate(self.samp_rate)
-        self.analog_sig_source_x_0_0.set_sampling_freq(self.samp_rate)
         self.analog_sig_source_x_0.set_sampling_freq(self.samp_rate)
 
     def get_nsigma(self):

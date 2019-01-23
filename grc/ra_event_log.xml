@@ -44,19 +44,9 @@
        * vlen
        * optional (set to 1 for optional inputs) -->
   <sink>
-    <name>magnitude</name>
-    <type>float</type>
-    <vlen>1</vlen>
-  </sink>
-  <sink>
-    <name>stddev</name>
-    <type>float</type>
-    <vlen>1</vlen>
-  </sink>
-  <sink>
-    <name>eventmjd</name>
+    <name>in</name>
     <type>complex</type>
-    <vlen>1</vlen>
+    <vlen>$vlen</vlen>
   </sink>
   <!-- Make one 'source' node per output. Sub-nodes:
        * name (an identifier for the GUI)

@@ -22,7 +22,7 @@ import datetime
 import numpy as np
 from gnuradio import gr
 import radioastronomy
-import cmjd_to_mjd
+import pmt
 
 try:
     import jdutil
@@ -37,7 +37,7 @@ class ra_event_sink(gr.sync_block):
     """
     Write Event File.  The input
     1) Time Sequence (vector) of I/Q complex samples
-    2) Event Modified Julian Date (complex, for precision)
+    2) Complex MJD of event
     The real and imaginary parts of the MJD sum to the actual MJD.
     Precision is lost during optimization in gnuradio value transfers.
     Parameters are
@@ -52,15 +52,13 @@ class ra_event_sink(gr.sync_block):
                                name="ra_event_sink",              
                                # inputs: time sequence of I,Q values,
                                # peak, rms, Event MJD
-                               in_sig=[(np.complex64, int(vlen)),
-                                       np.float32, np.float32, np.complex64],
-                               out_sig=[np.float32], )
+                               in_sig=[(np.complex64, int(vlen))],
+                               out_sig=None, )
         vlen = int(vlen)
         self.vlen = vlen
         self.ecount = 1
         self.record = int(record)
         self.obs = radioastronomy.Spectrum()
-        self.lastmjd = 0.
         self.setupdir = "./"
         noteParts = noteName.split('.')
         self.noteName = noteParts[0]+'.not'
@@ -80,6 +78,13 @@ class ra_event_sink(gr.sync_block):
                         pformat = "! Create the Note file %s, and try again !" 
                         print pformat % (self.noteName)
         self.obs.read_spec_ast(self.noteName)    # read the parameters
+
+        # prepare to Event get messages
+#        print 'Registered event on input port of sink'
+
+#        self.set_tag_propagation_policy(gr.TPP_ALL_TO_ALL)
+#        self.set_msg_handler(pmt.intern('in_port'), self.event_handler)
+
         self.obs.datadir = "../events/"          # writing events not spectra
         self.obs.noteB = "Event Detection"
         if not os.path.exists(self.obs.datadir):
@@ -99,7 +104,21 @@ class ra_event_sink(gr.sync_block):
         now = datetime.datetime.utcnow()
         self.eventutc = now
         self.obs.utc = now
+        self.eventmjd = jdutil.datetime_to_mjd( now)
+        self.lastmjd = self.eventmjd
+        self.emagnitude = 0.
+        self.erms = 0.
         self.set_sample_rate( bandwidth)
+
+    def event_handler(self, msg):
+        """
+        Receive the Peak, RMS and MJD on the input stream
+        """
+        print 'Event Message received: '
+        # Grab packet PDU data                                                                                                     
+        self.eventmjd = pmt.from_float(msg)
+        print 'MJD: %15.6f ' % (self.eventmjd)
+        return
 
     def forecast(self, noutput_items, ninput_items): #forcast is a no op
         """
@@ -165,41 +184,40 @@ class ra_event_sink(gr.sync_block):
         Work averages all input vectors and outputs one vector for each N inputs
         """
         inn = input_items[0]    # vectors of I/Q (complex) samples
-        peak = input_items[1]   # peak magnitudes of events
-        rms  = input_items[2]   # rmss of samples near events
-        mjd  = input_items[3]   # Modified Julian Dates of events (complex)
         
         # get the number of input vectors
         nv = len(inn)           # number of events in this port
-        samples = inn[0]        # first input vector
-        li = len(samples)       # length of first input vector
-        t = 0
 
-#        noutports = len(output_items)
-#        if noutports != 1:
-#            print '!!!!!!! Unexpected number of output ports: ', noutports
-        counts = output_items[0]  # all vectors in PORT 0
+        # Get tags from ra_vevent block
+#        print 'preparing to get tags: ', nv
+        tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+#
+        if len(tags) > 0:
+#            print 'Event Tags detected in sink: ', len(tags)
+            for tag in tags:
+#                print 'Tag: ', tag
+                value = pmt.to_python(tag.value)
+                if value[0] == 'MJD':
+                    self.eventmjd = value[1]
+#                    print 'Tag MJD : %15.9f' % (self.eventmjd)
+                elif value[0] == 'PEAK':
+                    self.emagnitude = value[1]
+#                    print 'Tag PEAK: %7.4f' % (self.emagnitude)
+                elif value[0] == 'RMS':
+                    self.erms = value[1]
+#                    print 'Tag RMs : %7.4f' % (self.erms)
+                else:
+                    print 'Unknown Tag: ', value
         nout = 0
-            
-        iout = 0 # count the number of output vectors
         for i in range(nv):
             # get the length of one input
             samples = inn[i]
-            peaks = peak[i]
-            rmss = rms[i]
-            cmjd = mjd[i]
-            # convert complex mjd into mjd
-            eventmjd = cmjd_to_mjd.cmjd_to_mjd( cmjd)
             # if new mjd 
-            if eventmjd > self.lastmjd:
-#                print "Event Recorded: %15.9f (MJD)" % (eventmjd)
-#                cmjd_to_mjd.print_cmjd( cmjd)
-#                print "->"
-#                cmjd_to_mjd.print_mjd( eventmjd)
-                self.lastmjd = eventmjd
+            if self.eventmjd > self.lastmjd:
+                self.lastmjd = self.eventmjd
                 self.obs.samples = samples
                 self.obs.nSamples = len(samples)
-                utc = jdutil.mjd_to_datetime( eventmjd)
+                utc = jdutil.mjd_to_datetime( self.eventmjd)
                 self.obs.utc = utc
                 # create file name from event time
                 strnow = utc.isoformat()
@@ -208,7 +226,7 @@ class ra_event_sink(gr.sync_block):
                 yymmdd = daypart[2:19]
 #                print 'Sink Event: ', self.ecount
 #                print 'Sink Utc : ', self.obs.utc
-#                print 'Sink MJD : %15.9f' % (eventmjd)
+#                print 'Sink MJD : %15.9f' % (self.eventmjd)
 #                print 'Sink days: %12.6f + %12.6f ' % (fdays, hours)
 #                print 'Sink Magnitude: ', peaks, ' +/- ', rmss
                 if self.record == radioastronomy.INTRECORD:
@@ -221,12 +239,9 @@ class ra_event_sink(gr.sync_block):
                     self.obs.write_ascii_file( self.obs.datadir, outname)
                     print('\a')  # ring the terminal bell
                 self.ecount = self.ecount + 1
+            nout = nout+1
             # output latest event count
-            counts[iout] = np.float(self.ecount)
-            iout = iout+1
-        if iout > 0:
-            output_items[0] = counts
-        return iout
+        return nout
     # end event_sink()
 
 

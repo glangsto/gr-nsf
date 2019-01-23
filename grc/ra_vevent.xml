@@ -54,10 +54,6 @@
     <name>in</name>
     <type>complex</type>
   </sink>
-  <sink>
-    <name>mag2</name>
-    <type>float</type>
-  </sink>
   <!-- Make one 'source' node per output. Sub-nodes:
        * name (an identifier for the GUI)
        * type
@@ -67,20 +63,5 @@
     <name>out</name>
     <type>complex</type>
     <vlen>$vlen</vlen>
-  </source>
-  <source>
-    <name>magnitude</name>
-    <type>float</type>
-    <vlen>1</vlen>
-  </source>
-  <source>
-    <name>stddev</name>
-    <type>float</type>
-    <vlen>1</vlen>
-  </source>
-  <source>
-    <name>eventmjd</name>
-    <type>complex</type>
-    <vlen>1</vlen>
   </source>
 </block>
