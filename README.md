@@ -35,6 +35,10 @@ the *Osmosdr* block.
 
 1. NsfIntegrate20.grc - Block configured to use an RTL SDR dongle with 2.0 MHz bandwidth for Radio Astronomy Observations
 
+1. eventdetect.grc - Event detection demonstration graph.
+
+1. eventwrite.grc - Event detection with writing of events and logging a summary.
+
 The '*.ast' files contain example spectral line observations. 
 
 The '*.hot' files contains hot-load calibration observations.  The NsfIntegrate blocks can overwrite these files.
@@ -91,11 +95,16 @@ Where process-id is one of the higher cpu usage processes on your device.
 ![Example Data Shown after an Observation](images/LightWork20Figure1.png)
 
 Figure 1 of LightWork Memo 20: Overview of our place in the Milky Way Galaxy (Left) and 10 Minutes of Observations of the Perseus Arm. The sketch at left shows our Sun (and us) far from the center of the Milky Way. The image was drawn as if we are way above our galaxy. Our galaxy is a disk and the coordinate of the center of our galaxy is at Galactic Longitude = 0. The galactic longitude, latitude coordinates are centered on us. The plot at right shows 9 beautiful minutes of data. With some research, you can figure out that you’ve discovered the Perseus Arm of our Galaxy. The plot shows calibrated intensity (Kelvins) versus the velocity of the hydrogen measured. The observations were taken with telescope Azimuth=180 degrees, and different Elevations (A,E =). The GRC block calculates the Longitude and Latitude (L,L=) for the time of the observations (21:06 to 21:15 UTC).
- 
+
+### Event detection
+
+One key science goal for radio astronomy is detection of flash events.  These events originate for distant astronomical sources
+and radio flashed created when very high energy cosmic rays strike the Earth's atmosphere. 
+
 ### Documentation
 
 http://www.opensourceradiotelescopes.org/wk
 
 ![Observer Interface Raw Signals](/images/NsfIntegrateRaw.png)
 
-Glen Langston -- glen.i.langston@gmail.com -- 2018 August 18
+Glen Langston -- glen.i.langston@gmail.com -- 2019 January 20
