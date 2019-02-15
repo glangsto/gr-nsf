@@ -23,6 +23,7 @@ Glen Langston (National Science Foundation)
 # Boston, MA 02110-1301, USA.
 #
 # History
+# 19FEB14 GIL update message header
 # 19JAN22 GIL try to speed up processing
 # 19JAN16 GIL deal with loss of precision in gnuradio companion streams
 # 19JAN15 GIL cleanup and document; remove writing to another block
@@ -365,16 +366,19 @@ class ra_vevent(gr.decim_block):
                         # describe event to subscribers to the sink vector
                         self.add_item_tag(0,
                             (self.nitems_written(0)+1),
-                            pmt.to_pmt('event'),
-                            pmt.to_pmt(('MJD', self.eventmjd)))
+                            pmt.to_pmt('MJD'),
+                            pmt.to_pmt(self.eventmjd),
+                            pmt.to_pmt('event'))
                         self.add_item_tag(0,
-                            (self.nitems_written(0)+1),
-                            pmt.to_pmt('event'),
-                            pmt.to_pmt(('PEAK', self.emagnitude)))
+                                          (self.nitems_written(0)+1),
+                                          pmt.to_pmt('PEAK'),
+                                          pmt.to_pmt(self.emagnitude),
+                                          pmt.to_pmt('event'))
                         self.add_item_tag(0,
-                            (self.nitems_written(0)+1),
-                            pmt.to_pmt('event'),
-                            pmt.to_pmt(('RMS', self.erms)))
+                                          (self.nitems_written(0)+1),
+                                          pmt.to_pmt('RMS'),
+                                          pmt.to_pmt(self.erms),
+                                          pmt.to_pmt('event'))
 #                        self.event_msg()       # report magnitude, rms and date
 #
                         self.ecount = self.ecount + 1   # keep event count

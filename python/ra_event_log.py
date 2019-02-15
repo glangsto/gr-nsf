@@ -15,6 +15,7 @@
 # GNU General Public License for more details.
 #
 # HISTORY
+# 19FEB14 GIL make tag labels compatible with C++ tags
 # 19JAN19 GIL initial version based on ra_event_sink
 
 import os
@@ -139,20 +140,22 @@ class ra_event_log(gr.sync_block):
         nv = len(inn)           # number of events in this port
         
         # get any tags of a new detected event
-        tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+#        tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+        tags = self.get_tags_in_window(0, 0, +self.vlen)
         # if there are tags, then a new event was detected
         if len(tags) > 0:
             for tag in tags:
 #                print 'Tag: ', tag
+                key = pmt.to_python(tag.key)
                 value = pmt.to_python(tag.value)
-                if value[0] == 'MJD':
-                    self.eventmjd = value[1]
+                if key == 'MJD':
+                    self.eventmjd = value
 #                    print 'Tag MJD : %15.9f' % (self.eventmjd)
-                elif value[0] == 'PEAK':
-                    self.emagnitude = value[1]
+                elif key == 'PEAK':
+                    self.emagnitude = value
 #                    print 'Tag PEAK: %7.4f' % (self.emagnitude)
-                elif value[0] == 'RMS':
-                    self.erms = value[1]
+                elif key == 'RMS':
+                    self.erms = value
 #                    print 'Tag RMs : %7.4f' % (self.erms)
                 else:
                     print 'Unknown Tag: ', value

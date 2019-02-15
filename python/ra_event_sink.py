@@ -14,6 +14,7 @@
 # GNU General Public License for more details.
 #
 # HISTORY
+# 19FEB14 GIL make tags more compatible with C++ tags
 # 19JAN15 GIL initial version based on ra_ascii_sink
 
 import os
@@ -190,21 +191,22 @@ class ra_event_sink(gr.sync_block):
 
         # Get tags from ra_vevent block
 #        print 'preparing to get tags: ', nv
-        tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+#        tags = self.get_tags_in_window(0, 0, +self.vlen, pmt.to_pmt('event'))
+        tags = self.get_tags_in_window(0, 0, +self.vlen)
 #
         if len(tags) > 0:
-#            print 'Event Tags detected in sink: ', len(tags)
             for tag in tags:
-#                print 'Tag: ', tag
+#            print 'Event Tags detected in sink: ', len(tags)
+                key = pmt.to_python(tag.key)
                 value = pmt.to_python(tag.value)
-                if value[0] == 'MJD':
-                    self.eventmjd = value[1]
+                if key == 'MJD':
+                    self.eventmjd = value
 #                    print 'Tag MJD : %15.9f' % (self.eventmjd)
-                elif value[0] == 'PEAK':
-                    self.emagnitude = value[1]
+                elif key == 'PEAK':
+                    self.emagnitude = value
 #                    print 'Tag PEAK: %7.4f' % (self.emagnitude)
-                elif value[0] == 'RMS':
-                    self.erms = value[1]
+                elif key == 'RMS':
+                    self.erms = value
 #                    print 'Tag RMs : %7.4f' % (self.erms)
                 else:
                     print 'Unknown Tag: ', value
